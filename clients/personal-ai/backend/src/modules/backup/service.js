@@ -79,9 +79,21 @@ function listBackups() {
   return backups;
 }
 
+// 校验备份 ID：仅允许合法的 backup-<timestamp> 格式，防止路径穿越删除/覆盖任意目录
+function validateBackupId(backupId) {
+  if (typeof backupId !== 'string' || !/^backup-[A-Za-z0-9._-]+$/.test(backupId)) {
+    throw new Error('非法的备份 ID');
+  }
+  const backupDir = path.resolve(path.join(BACKUP_DIR, backupId));
+  if (!backupDir.startsWith(path.resolve(BACKUP_DIR) + path.sep)) {
+    throw new Error('非法的备份 ID');
+  }
+  return backupDir;
+}
+
 // 删除备份
 function deleteBackup(backupId) {
-  const backupDir = path.join(BACKUP_DIR, backupId);
+  const backupDir = validateBackupId(backupId);
   if (!fs.existsSync(backupDir)) {
     throw new Error('备份不存在');
   }
@@ -91,7 +103,7 @@ function deleteBackup(backupId) {
 
 // 恢复备份
 function restoreBackup(backupId) {
-  const backupDir = path.join(BACKUP_DIR, backupId);
+  const backupDir = validateBackupId(backupId);
   if (!fs.existsSync(backupDir)) {
     throw new Error('备份不存在');
   }

@@ -27,6 +27,34 @@ const PRIVATE_CONFIG = {
 
 // ========== 工具函数 ==========
 
+/**
+ * 转义用户输入中的正则元字符，防止畸形正则导致抛错或 ReDoS
+ */
+function escapeRegExp(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * 允许私人工具读取的根目录白名单（vault / prompt / review / 仓库内置公开知识 / data 目录）
+ */
+const ALLOWED_READ_ROOTS = [
+  PRIVATE_CONFIG.obsidianVault,
+  PRIVATE_CONFIG.promptDir,
+  PRIVATE_CONFIG.reviewDir,
+  path.join(__dirname, '..', '..', 'knowledge', 'public'),
+  path.join(__dirname, '..', '..', '..', 'data'),
+  process.env.MEMORY_DIR || '',
+].filter(Boolean).map(p => path.resolve(p));
+
+/**
+ * 校验目标路径必须位于白名单根目录之内，防止路径穿越读取本机任意文件
+ */
+function isPathAllowed(targetPath) {
+  if (!targetPath) return false;
+  const resolved = path.resolve(targetPath);
+  return ALLOWED_READ_ROOTS.some(root => resolved === root || resolved.startsWith(root + path.sep));
+}
+
 function searchFiles(dir, query, limit = 5) {
   if (!dir || !fs.existsSync(dir)) return [];
 
@@ -37,7 +65,7 @@ function searchFiles(dir, query, limit = 5) {
     const filePath = path.join(dir, file);
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const score = (content.toLowerCase().match(new RegExp(query.toLowerCase(), 'g')) || []).length;
+      const score = (content.toLowerCase().match(new RegExp(escapeRegExp(query.toLowerCase()), 'g')) || []).length;
       if (score > 0) {
         results.push({
           title: file.replace('.md', ''),
@@ -55,6 +83,8 @@ function searchFiles(dir, query, limit = 5) {
 }
 
 function getFileContent(filePath) {
+  // 白名单校验：只允许读取已配置的数据目录内的文件
+  if (!isPathAllowed(filePath)) return null;
   if (!fs.existsSync(filePath)) return null;
   try {
     return fs.readFileSync(filePath, 'utf-8');
@@ -63,10 +93,21 @@ function getFileContent(filePath) {
   }
 }
 
+/**
+ * 清洗文件名：剥离路径分隔符与 ..，防止保存时逃逸目标目录
+ */
+function sanitizeTitle(title) {
+  return String(title || '')
+    .replace(/[\\/:*?"<>|]/g, '_')
+    .replace(/\.\./g, '_')
+    .replace(/^\.+/, '')
+    .trim() || 'untitled';
+}
+
 function saveFile(dir, title, content) {
   if (!dir) return { success: false, error: '目录未配置' };
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  const filePath = path.join(dir, `${title}.md`);
+  const filePath = path.join(dir, `${sanitizeTitle(title)}.md`);
   fs.writeFileSync(filePath, content, 'utf-8');
   return { success: true, path: filePath };
 }

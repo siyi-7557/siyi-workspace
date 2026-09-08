@@ -1,8 +1,8 @@
 /**
  * Knowledge Service - 统一知识服务
  * 
- * Meet Siyi 和 Personal AI 都通过同一个知识服务获取信息。
- * 支持权限过滤：Meet Siyi 只能访问 public 知识，Personal AI 可访问全部。
+ * 单入口（Personal AI 本地工作台）使用全部知识。
+ * 支持 BM25 + 向量混合检索：配置嵌入 API Key（SILICONFLOW_API_KEY）时走向量化，否则回退纯 BM25。
  * 
  * 核心 API：
  * - searchKnowledge(query, options)  统一检索入口（含权限过滤）
@@ -14,6 +14,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const RAGEmbedding = require('../rag/embedding');
 
 class KnowledgeService {
   constructor(options = {}) {
@@ -28,6 +29,10 @@ class KnowledgeService {
     this.indexFile = options.indexFile || path.join(this.rootDir, 'data', 'rag-index.json');
     this._docs = null;
     this._bm25Index = null;
+    // 向量检索：嵌入客户端（自读 SILICONFLOW_API_KEY）+ 文档向量缓存
+    this._embedding = new RAGEmbedding(options.embedding || {});
+    this._embeddingAvailable = this._embedding.isAvailable();
+    this._docVectors = new Map(); // doc.id -> vector
   }
 
   /**
@@ -47,18 +52,30 @@ class KnowledgeService {
   async searchKnowledge(query, options = {}) {
     if (!this._docs) await this.init();
 
-    const visibility = options.visibility || 'public';
+    const visibility = options.visibility || 'all';
     const topK = options.topK || 3;
 
-    // 权限过滤：Meet Siyi 只能访问 public
+    // 单入口：personal-ai 使用全部知识；保留 public 过滤供需要时使用
     let docs = this._docs;
     if (visibility === 'public') {
       docs = docs.filter(d => d.visibility === 'public');
     }
 
+    const mode = options.mode || 'bm25';
+    const useVector = (mode === 'embedding' || mode === 'auto') && this._embeddingAvailable;
+
+    // 向量 + BM25 混合（配置嵌入 Key 时启用）
+    if (useVector) {
+      try {
+        const fused = await this._searchHybrid(query, docs, topK);
+        if (fused.length > 0) return this._formatResults(fused);
+      } catch (err) {
+        console.warn(`[KnowledgeService] 向量检索失败，回退 BM25: ${err.message}`);
+      }
+    }
+
     // BM25 检索（默认，零成本）
     const results = this._searchBM25(query, docs, topK);
-
     return this._formatResults(results);
   }
 
@@ -83,6 +100,77 @@ class KnowledgeService {
    */
   async getMemory(query) {
     return [];
+  }
+
+  /**
+   * BM25 + 向量混合：归一化后加权融合（BM25 0.4 + 向量 0.6）
+   */
+  async _searchHybrid(query, docs, topK) {
+    const bm25 = this._searchBM25(query, docs, Math.max(docs.length, topK));
+    const vec = await this._searchVector(query, docs, Math.max(docs.length, topK));
+
+    const bmMax = Math.max(1e-9, ...bm25.map(r => r.score));
+    const vecMax = Math.max(1e-9, ...vec.map(r => r.score));
+    const fused = new Map();
+    bm25.forEach(r => fused.set(r.doc.id, { doc: r.doc, bm: r.score / bmMax, vec: 0 }));
+    vec.forEach(r => {
+      const entry = fused.get(r.doc.id) || { doc: r.doc, bm: 0, vec: 0 };
+      entry.vec = r.score / vecMax;
+      fused.set(r.doc.id, entry);
+    });
+
+    return [...fused.values()]
+      .map(e => ({ doc: e.doc, score: 0.4 * e.bm + 0.6 * e.vec }))
+      .filter(r => r.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, topK);
+  }
+
+  /**
+   * 向量检索：查询向量与文档向量做余弦相似度
+   */
+  async _searchVector(query, docs, topK) {
+    if (!this._embeddingAvailable) return [];
+    await this._ensureDocVectors(docs);
+    const qv = await this._embedding.embed(query);
+    if (!Array.isArray(qv) || qv.length === 0) return [];
+
+    return docs
+      .map(d => {
+        const dv = this._docVectors.get(d.id);
+        if (!dv) return null;
+        return { doc: d, score: this._cosineSimilarity(qv, dv) };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, topK);
+  }
+
+  /**
+   * 为缺失缓存的文档生成向量（embed 一次批量返回）
+   */
+  async _ensureDocVectors(docs) {
+    const missing = docs.filter(d => !this._docVectors.has(d.id));
+    if (missing.length === 0) return;
+    const texts = missing.map(d => `${d.title}\n${d.content}`);
+    const vectors = await this._embedding.embed(texts);
+    if (!Array.isArray(vectors)) return;
+    vectors.forEach((v, i) => this._docVectors.set(missing[i].id, v));
+  }
+
+  /**
+   * 余弦相似度
+   */
+  _cosineSimilarity(a, b) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length === 0 || a.length !== b.length) return 0;
+    let dot = 0, na = 0, nb = 0;
+    for (let i = 0; i < a.length; i++) {
+      dot += a[i] * b[i];
+      na += a[i] * a[i];
+      nb += b[i] * b[i];
+    }
+    const denom = Math.sqrt(na) * Math.sqrt(nb);
+    return denom ? dot / denom : 0;
   }
 
   /**

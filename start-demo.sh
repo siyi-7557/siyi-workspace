@@ -29,7 +29,7 @@ else
   npm install
   if [ $? -ne 0 ]; then
     echo
-    echo "依赖安装失败，请确认已安装 Node.js >= 16，再重试。"
+    echo "依赖安装失败，请确认已安装 Node.js >= 20，再重试。"
     read -r -p "按回车退出" _
     exit 1
   fi

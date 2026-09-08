@@ -48,6 +48,12 @@ class AIGateway {
       }
     }
 
+    // 2.5 长期记忆召回（跨会话）——检索长期记忆并注入 system 上下文
+    await this._injectMemoryContext(conversation, lastUserMessage);
+
+    // 记录本轮用户消息到会话记忆
+    this._remember(sessionId, { role: 'user', content: lastUserMessage });
+
     // 3. 获取可用工具（权限过滤）
     const toolDefinitions = this.tools.getToolDefinitions(persona.allowedTools);
 
@@ -75,6 +81,7 @@ class AIGateway {
       const toolCalls = message.tool_calls || [];
       if (toolCalls.length === 0) {
         // 没有工具调用，返回最终回答
+        this._remember(sessionId, { role: 'assistant', content: message.content });
         if (stream) {
           return this._streamFinalAnswer(message.content, persona);
         }
@@ -131,10 +138,44 @@ class AIGateway {
 
     // 返回最后一条 assistant 消息
     const lastMessage = conversation.filter(m => m.role === 'assistant').pop();
+    if (lastMessage?.content) {
+      this._remember(sessionId, { role: 'assistant', content: lastMessage.content });
+    }
     return { reply: lastMessage?.content || '', iterations, toolCalls: toolCallsInfo, truncated: true };
   }
 
   // ========== 内部方法 ==========
+
+  /**
+   * 把本轮消息写入会话记忆（静默失败，不阻断对话主链路）
+   */
+  _remember(sessionId, message) {
+    if (!this.memory || !sessionId || typeof this.memory.saveMessage !== 'function') return;
+    try {
+      this.memory.saveMessage(sessionId, message).catch(() => {});
+    } catch (e) {
+      // 记忆写入失败不影响回答
+    }
+  }
+
+  /**
+   * 长期记忆召回：把跨会话记忆注入 system 上下文（静默失败）
+   */
+  async _injectMemoryContext(conversation, query) {
+    if (!this.memory || typeof this.memory.searchLongTerm !== 'function') return;
+    if (!query || !this._shouldRetrieve(query)) return;
+    try {
+      const memResults = await this.memory.searchLongTerm(query, 3);
+      if (Array.isArray(memResults) && memResults.length > 0) {
+        const memContext = memResults
+          .map(m => `- ${m.metadata?.title || m.key}：${typeof m.value === 'string' ? m.value : JSON.stringify(m.value)}`)
+          .join('\n');
+        conversation[0].content += `\n\n## 长期记忆\n以下是与当前话题相关的跨会话记忆，可自然引用：\n${memContext}`;
+      }
+    } catch (e) {
+      // 记忆召回失败不影响对话
+    }
+  }
 
   /**
    * 判断是否需要对用户消息进行知识检索
@@ -238,6 +279,12 @@ class AIGateway {
         conversation = this._injectRAGContext(conversation, ragContext);
       }
     }
+
+    // 2.5 长期记忆召回（跨会话）——检索长期记忆并注入 system 上下文
+    await this._injectMemoryContext(conversation, lastUserMessage);
+
+    // 记录本轮用户消息到会话记忆
+    this._remember(sessionId, { role: 'user', content: lastUserMessage });
 
     // 3. 获取工具定义
     const toolDefinitions = this.tools.getToolDefinitions(persona.allowedTools);
@@ -369,6 +416,10 @@ class AIGateway {
       if (!outputEnded) {
         // LLM 流自然结束但未发 [DONE]（异常情况），也要给前端一个明确的结束信号
         endOutput();
+      }
+      // 记录本轮最终回答到会话记忆
+      if (fullContent) {
+        this._remember(sessionId, { role: 'assistant', content: fullContent });
       }
     });
 

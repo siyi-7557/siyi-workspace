@@ -1,15 +1,11 @@
 /**
  * Siyi AI Core - 统一 AI 核心入口
- * 
- * 一个 AI Core，两个入口：
- * - Meet Siyi：公网网站，公开人格层
- * - Personal AI：本地工作台，私人助手层
- * 
- * 两者共享同一个 Knowledge Core，通过不同 System Prompt 和权限控制实现不同职责。
+ *
+ * 单入口：仅 Personal AI（本地工作台，私人助手层）。
+ * 共享同一套 Knowledge / Tool / RAG / LLM / Memory，通过 System Prompt 与工具权限控制职责。
  */
 
 const AIGateway = require('./gateway');
-const PersonaLoader = require('./persona');
 const KnowledgeService = require('./knowledge/service');
 const ToolRegistry = require('./tools/registry');
 const LLRouter = require('./llm/router');
@@ -38,9 +34,8 @@ class SiyiAICore {
   async init() {
     if (this._initialized) return;
 
-    // 加载人格配置
+    // 加载人格配置（单入口：仅 personal-ai）
     this.personas = {
-      'meet-siyi': require('./persona/meet-siyi'),
       'personal-ai': require('./persona/personal-ai'),
     };
 
@@ -61,7 +56,7 @@ class SiyiAICore {
 
   /**
    * 统一对话入口
-   * @param {string} personaType - 'meet-siyi' | 'personal-ai'
+   * @param {string} personaType - 'personal-ai'
    * @param {Object} input - { messages, sessionId, source }
    * @param {Object} options - { stream, model }
    * @returns {Promise<Object|ReadableStream>}
@@ -71,7 +66,7 @@ class SiyiAICore {
 
     const persona = this.personas[personaType];
     if (!persona) {
-      throw new Error(`未知的人格类型: ${personaType}，可选: meet-siyi, personal-ai`);
+      throw new Error(`未知的人格类型: ${personaType}，可选: personal-ai`);
     }
 
     return this.gateway.processMessage(persona, input, options);
@@ -85,7 +80,7 @@ class SiyiAICore {
 
     const persona = this.personas[personaType];
     if (!persona) {
-      throw new Error(`未知的人格类型: ${personaType}，可选: meet-siyi, personal-ai`);
+      throw new Error(`未知的人格类型: ${personaType}，可选: personal-ai`);
     }
 
     return this.gateway.processMessageStream(persona, input, options);

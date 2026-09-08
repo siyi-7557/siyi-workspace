@@ -15,6 +15,28 @@
 const path = require('path');
 const fs = require('fs');
 
+/**
+ * 原子写入：先写临时文件再 rename，避免进程中断留下半截 JSON
+ */
+function atomicWriteFile(file, content) {
+  const tmp = `${file}.tmp-${process.pid}-${Date.now()}`;
+  fs.writeFileSync(tmp, content, 'utf-8');
+  fs.renameSync(tmp, file);
+}
+
+/**
+ * 安全读取 JSON：文件缺失/损坏时返回 null（由调用方决定降级行为），不抛异常
+ */
+function safeReadJson(file) {
+  try {
+    if (!fs.existsSync(file)) return null;
+    return JSON.parse(fs.readFileSync(file, 'utf-8'));
+  } catch (e) {
+    console.warn(`[MemoryService] 记忆文件读取失败(已跳过): ${path.basename(file)} - ${e.message}`);
+    return null;
+  }
+}
+
 class MemoryService {
   constructor(options = {}) {
     this.options = options;
@@ -72,7 +94,7 @@ class MemoryService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+    atomicWriteFile(file, JSON.stringify(data, null, 2));
     return data;
   }
 
@@ -81,8 +103,7 @@ class MemoryService {
    */
   async getLongTerm(key) {
     const file = path.join(this.memoryDir, `${key}.json`);
-    if (!fs.existsSync(file)) return null;
-    return JSON.parse(fs.readFileSync(file, 'utf-8'));
+    return safeReadJson(file);
   }
 
   /**
@@ -93,7 +114,8 @@ class MemoryService {
     const files = fs.readdirSync(this.memoryDir).filter(f => f.endsWith('.json'));
     const results = [];
     for (const file of files) {
-      const data = JSON.parse(fs.readFileSync(path.join(this.memoryDir, file), 'utf-8'));
+      const data = safeReadJson(path.join(this.memoryDir, file));
+      if (!data) continue;
       const content = JSON.stringify(data.value || '') + ' ' + (data.metadata?.title || '');
       if (content.toLowerCase().includes(query.toLowerCase())) {
         results.push(data);

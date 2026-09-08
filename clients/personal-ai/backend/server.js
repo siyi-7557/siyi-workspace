@@ -36,7 +36,7 @@ function startServer(host) {
   const server = app.listen(PORT, host, () => {
     console.log(`\n  思意工作台已启动`);
     console.log(`  本地地址: http://localhost:${PORT}`);
-    console.log(`  监听接口: ${host || '所有接口（::）'}`);
+    console.log(`  监听接口: ${host}（仅本机回环，不对局域网暴露；可用 HOST 环境变量覆盖）`);
     console.log(`  环境: ${process.env.NODE_ENV || 'development'}\n`);
     // 启动自动定时备份
     startAutoBackup();
@@ -52,7 +52,8 @@ function startServer(host) {
     }
   });
 }
-startServer();
+// 默认只监听本机回环地址（个人数据不上网）；需要局域网访问时设 HOST=0.0.0.0
+startServer(process.env.HOST || '127.0.0.1');
 
 // 自动定时备份 - 每天凌晨3点自动备份
 function startAutoBackup() {

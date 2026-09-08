@@ -10,7 +10,21 @@ db.init();
 
 const app = express();
 
-app.use(cors());
+// CORS：默认仅允许本机来源（localhost/127.0.0.1）；需要额外来源时用 CORS_ORIGINS 环境变量配置（逗号分隔）。
+// 无 Origin 头的请求（同源页面、curl、Electron 主进程）默认放行。
+const extraOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+app.use(cors({
+  origin(origin, cb) {
+    if (!origin) return cb(null, true);
+    try {
+      const { hostname } = new URL(origin);
+      if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]' || extraOrigins.includes(origin)) {
+        return cb(null, true);
+      }
+    } catch (e) { /* 非法 Origin */ }
+    return cb(null, false);
+  },
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 

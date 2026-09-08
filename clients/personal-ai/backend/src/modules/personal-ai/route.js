@@ -10,8 +10,11 @@ const path = require('path');
 const router = express.Router();
 const db = require('../../core/db');
 
-// 引入 Siyi OS 共享 AI Core
+// 引入 Siyi OS 共享 AI Core（__dirname = backend/src/modules/personal-ai，上跳 6 级到仓库根）
 const SiyiAICore = require('../../../../../../ai-core');
+
+// 仓库根目录（与 backend/index.js 的 data/memory 指向保持一致）
+const REPO_ROOT = path.join(__dirname, '..', '..', '..', '..', '..', '..');
 
 let aiCore = null;
 async function getAICore() {
@@ -35,7 +38,7 @@ async function getAICore() {
         deepseekApiKey: process.env.DEEPSEEK_API_KEY,
         qwenApiKey: process.env.QWEN_API_KEY,
       },
-      memory: { memoryDir: path.join(__dirname, '..', '..', '..', '..', '..', 'data', 'memory') },
+      memory: { memoryDir: path.join(REPO_ROOT, 'data', 'memory') },
     });
     await aiCore.init();
 

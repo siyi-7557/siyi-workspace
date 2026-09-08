@@ -2,7 +2,20 @@
   "name": "siyi-os",
   "version": "1.0.0",
   "private": true,
-  "description": "Siyi OS —— 一个 AI Core，两个入口。个人 AI 工作台 + 公网数字伙伴。评估 / 招聘演示请用下面的 demo:* 脚本（零依赖、无需 API Key）。",
+  "description": "Siyi OS —— 个人 AI 工作台：统一 AI Core（RAG 检索 / 跨会话记忆 / Agent 工具调用 / 可复现评测）。评估 / 招聘演示请用下面的 demo:* 脚本（零依赖、无需 API Key）。",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/siyi-7557/siyi-workspace"
+  },
+  "author": "siyi-7557",
+  "keywords": [
+    "rag",
+    "ai-workspace",
+    "tool-calling",
+    "memory",
+    "local-first"
+  ],
   "scripts": {
     "demo:web": "npm --prefix clients/personal-ai run demo:web",
     "demo:app": "npm --prefix clients/personal-ai run demo:app",
@@ -14,6 +27,6 @@
     "demo:full": "npm --prefix clients/personal-ai run demo:full"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   }
 }

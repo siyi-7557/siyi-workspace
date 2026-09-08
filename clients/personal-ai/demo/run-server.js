@@ -198,9 +198,9 @@ const server = http.createServer(async (req, res) => {
       const file = path.join(PUBLIC_DIR, 'index.html');
       return serve(res, file);
     }
-    // 静态文件
-    const file = path.join(PUBLIC_DIR, path.normalize(p).replace(/^([/\\])+/, ''));
-    if (file.startsWith(PUBLIC_DIR) && fs.existsSync(file)) return serve(res, file);
+    // 静态文件（限制在 PUBLIC_DIR 内，禁止路径穿越）
+    const file = path.resolve(PUBLIC_DIR, path.normalize(p).replace(/^([/\\])+/, ''));
+    if ((file === path.resolve(path.join(PUBLIC_DIR, 'index.html')) || file.startsWith(PUBLIC_DIR + path.sep)) && fs.existsSync(file)) return serve(res, file);
 
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('404');
@@ -217,7 +217,8 @@ function serve(res, file) {
   res.end(body);
 }
 
-server.listen(PORT, () => {
+// 仅监听本机回环地址，不对局域网暴露
+server.listen(PORT, '127.0.0.1', () => {
   console.log('======================================================');
   console.log('   Siyi Personal AI Workspace — Demo Mode');
   console.log(`   已就绪，请用浏览器打开： http://localhost:${PORT}`);

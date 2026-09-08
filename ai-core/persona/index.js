@@ -1,14 +1,12 @@
 /**
  * Persona Loader - 人格配置加载器
- * 
- * 统一管理 Meet Siyi 和 Personal AI 的人格配置。
+ *
+ * 单入口：仅 Personal AI（本地工作台）。
  */
 
-const meetSiyi = require('./meet-siyi');
 const personalAI = require('./personal-ai');
 
 const PERSONAS = {
-  'meet-siyi': meetSiyi,
   'personal-ai': personalAI,
 };
 

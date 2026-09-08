@@ -208,7 +208,10 @@ class EventService {
       // 只持久化今天的事件
       const today = new Date().toISOString().split('T')[0];
       const todayEvents = this._events.filter(e => e.createdAt.startsWith(today));
-      fs.writeFileSync(file, JSON.stringify(todayEvents, null, 2), 'utf-8');
+      // 原子写入：先写临时文件再 rename，避免中断留下半截 JSON
+      const tmp = `${file}.tmp-${process.pid}-${Date.now()}`;
+      fs.writeFileSync(tmp, JSON.stringify(todayEvents, null, 2), 'utf-8');
+      fs.renameSync(tmp, file);
     } catch (e) {
       console.error('[EventService] 持久化事件失败:', e.message);
     }

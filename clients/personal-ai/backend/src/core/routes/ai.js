@@ -9,20 +9,23 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 
-// 引入 Siyi OS 共享 AI Core
+// 引入 Siyi OS 共享 AI Core（__dirname = backend/src/core/routes，上跳 6 级到仓库根）
 const SiyiAICore = require('../../../../../../ai-core');
+
+// 仓库根目录（KnowledgeService 需要 rootDir/ai-core/knowledge/public；memory 与 backend/index.js 一致指向 <repo>/data/memory）
+const REPO_ROOT = path.join(__dirname, '..', '..', '..', '..', '..', '..');
 
 let aiCore = null;
 async function getAICore() {
   if (!aiCore) {
     aiCore = new SiyiAICore({
-      knowledge: { rootDir: path.join(__dirname, '..', '..', '..', '..', '..') },
+      knowledge: { rootDir: REPO_ROOT },
       llm: {
         zhipuApiKey: process.env.ZHIPU_API_KEY,
         deepseekApiKey: process.env.DEEPSEEK_API_KEY,
         qwenApiKey: process.env.QWEN_API_KEY,
       },
-      memory: { memoryDir: path.join(__dirname, '..', '..', '..', '..', '..', 'data', 'memory') },
+      memory: { memoryDir: path.join(REPO_ROOT, 'data', 'memory') },
     });
     await aiCore.init();
     console.log('[AI Route] Siyi OS AI Core 已初始化');

@@ -106,11 +106,6 @@ class ToolRegistry {
       throw new Error(`工具不存在: ${name}`);
     }
 
-    // 权限校验：Meet Siyi 不能调用 private 工具
-    if (context.personaType === 'meet-siyi' && tool.category === 'private') {
-      return { success: false, error: `权限不足：Meet Siyi 不能调用 private 工具 ${name}` };
-    }
-
     try {
       const result = await tool.execute(args, context);
       return { success: true, data: result };
