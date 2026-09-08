@@ -47,20 +47,21 @@ npm run demo:full     # 入库→检索→记忆→工具→回答（全链路�
 > - `ZHIPU_API_KEY` —— **聊天/回答**用（智谱 GLM）。不填则聊天提示「未配置 Key」；视图/检索/记忆/评测**无需**。
 > - `SILICONFLOW_API_KEY` —— **语义向量检索**用（硅基流动 BGE-m3）。填了才真正走「BM25+向量」混合，**召回质量更好**；不填回退纯 BM25（召回略降）。两个是不同的服务商，**需分别申请，不能一个顶两个**。
 
-### Demo 的 RAG 评测结果（真实运行产出）
+### 工作台生产链路 RAG 评测结果（真实运行产出）
 
-`clients/personal-ai/demo/eval/queries.json`（10 条带 ground-truth，hybrid，topK=5，离线确定性运行，任何人重跑结果一致）：
+用**工作台 Agent 实际使用的检索器**（`backend/src/core/rag/indexer`，BM25 + 向量 hybrid），在 `demo/corpus` 上按 `demo/eval/queries.json`（10 条带 ground-truth，topK=5）离线确定性评测——广告里的召回数字来自**生产链路本身**，而非另一套实现：
 
 | 指标 | 数值 |
 |---|---|
-| Recall@1 | 0.90 |
+| Recall@1 | 1.00 |
 | Recall@3 | 1.00 |
 | Recall@5 | 1.00 |
-| Precision@3 | 0.77 |
-| MRR | 0.95 |
-| nDCG@3 | 0.81 |
+| Precision@1 | 1.00 |
+| Precision@3 | 0.33 |
+| MRR | 1.00 |
+| nDCG@3 | 1.00 |
 
-复现：`npm run eval:rag`（或 `node clients/personal-ai/demo/run-eval.js hybrid`）。
+复现：`npm run eval:rag`（= `node clients/personal-ai/demo/run-workbench-eval.js hybrid`）。demo 语料为人工匹配的精简集，故 Recall@1 达 1.00；真实知识库（噪声文档多）召回会低于此。
 
 ---
 

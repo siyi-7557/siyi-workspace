@@ -16,7 +16,7 @@
     "demo:web": "node demo/run-server.js",
     "demo:app": "node demo/run-app.js",
     "demo:init": "node demo/init-demo.js",
-    "eval:rag": "node demo/run-eval.js"
+    "eval:rag": "node demo/run-workbench-eval.js"
   },
   "keywords": [
     "ai",
