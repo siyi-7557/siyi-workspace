@@ -15,7 +15,7 @@ Siyi OS 是思意的统一 AI 系统，将 Meet Siyi（公网网站数字伙伴�
 
 ```bash
 # 获取代码（二选一）
-git clone https://github.com/siyi-7557/siyi-os && cd siyi-os
+git clone https://github.com/siyi-7557/siyi-workspace && cd siyi-workspace
 # 或：GitHub 页面右上角 Code → Download ZIP，解压后 cd siyi-os
 
 # 安装真实工作台依赖（demo:app 需要 express / better-sqlite3 等）
