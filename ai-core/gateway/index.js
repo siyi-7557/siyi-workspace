@@ -33,6 +33,8 @@ class AIGateway {
 
     // 1. 构建对话上下文
     let conversation = this._buildConversation(persona, messages);
+    // 1.5 跨会话上下文：把本会话历史并入（客户端只发单条新消息时，补上上一轮对话）
+    conversation = await this._mergeSessionHistory(conversation, sessionId, messages);
 
     // 2. 知识检索（RAG）——仅对真正的信息类问题检索，闲聊/简短问候跳过，避免浪费 token 与干扰人设
     const lastUserMessage = messages.filter(m => m.role === 'user').pop()?.content || '';
@@ -178,6 +180,26 @@ class AIGateway {
   }
 
   /**
+   * 跨会话上下文：把 `_sessions` 里本会话的历史消息并入对话（去重，避免与客户端已传历史重复）
+   */
+  async _mergeSessionHistory(conversation, sessionId, messages) {
+    if (!this.memory || !sessionId || typeof this.memory.getSessionHistory !== 'function') return conversation;
+    try {
+      const hist = await this.memory.getSessionHistory(sessionId, 10);
+      if (!Array.isArray(hist) || hist.length === 0) return conversation;
+      const seen = new Set(conversation.map(m => `${m.role}:${m.content}`));
+      const toAdd = hist.filter(m => m.role !== 'system' && !seen.has(`${m.role}:${m.content}`));
+      if (toAdd.length === 0) return conversation;
+      const prior = toAdd.map(m => ({ role: m.role, content: m.content }));
+      // 插在 system 之后
+      conversation.splice(1, 0, ...prior);
+    } catch (e) {
+      // 记忆读回失败不影响对话
+    }
+    return conversation;
+  }
+
+  /**
    * 判断是否需要对用户消息进行知识检索
    * 简短问候/寒暄/纯情绪回复不检索，避免浪费 token 且干扰人设
    */
@@ -266,6 +288,7 @@ class AIGateway {
 
     // 1. 构建对话上下文
     let conversation = this._buildConversation(persona, messages);
+    conversation = await this._mergeSessionHistory(conversation, sessionId, messages);
 
     // 2. 知识检索（RAG）——仅对真正的信息类问题检索，闲聊/简短问候跳过
     const lastUserMessage = messages.filter(m => m.role === 'user').pop()?.content || '';

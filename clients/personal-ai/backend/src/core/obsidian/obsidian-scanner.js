@@ -265,11 +265,11 @@ function getReviewDetail(relPath) {
     let prompts = [];
     let actionItems = [];
     let learnings = [];
-    try { problems = extractProblemsFromContent(parsed.body) || []; } catch(e) {}
-    try { goodPractices = extractGoodPracticesFromContent(parsed.body) || []; } catch(e) {}
-    try { prompts = extractPromptsFromContent(parsed.body) || []; } catch(e) {}
-    try { actionItems = extractActionItemsFromContent(parsed.body) || []; } catch(e) {}
-    try { learnings = extractLearningsFromContent(parsed.body) || []; } catch(e) {}
+    try { problems = extractProblemsFromContent(parsed.body) || []; } catch(e) { console.warn(`[ObsidianScanner] 解析 problems 失败: ${e.message}`); }
+    try { goodPractices = extractGoodPracticesFromContent(parsed.body) || []; } catch(e) { console.warn(`[ObsidianScanner] 解析 goodPractices 失败: ${e.message}`); }
+    try { prompts = extractPromptsFromContent(parsed.body) || []; } catch(e) { console.warn(`[ObsidianScanner] 解析 prompts 失败: ${e.message}`); }
+    try { actionItems = extractActionItemsFromContent(parsed.body) || []; } catch(e) { console.warn(`[ObsidianScanner] 解析 actionItems 失败: ${e.message}`); }
+    try { learnings = extractLearningsFromContent(parsed.body) || []; } catch(e) { console.warn(`[ObsidianScanner] 解析 learnings 失败: ${e.message}`); }
 
     return {
       path: relPath,

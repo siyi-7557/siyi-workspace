@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Syntax check entry files
+        run: |
+          node --check ai-core/index.js
+          node --check ai-core/gateway/index.js
+          node --check ai-core/llm/router.js
+          node --check clients/personal-ai/backend/server.js
+          node --check clients/personal-ai/backend/src/index.js
+
+      - name: RAG eval (zero-dep, offline)
+        run: npm run eval:rag
+
+      - name: Full loop demo (zero-dep, offline)
+        run: npm run demo:full
+
+      - name: Memory demo (zero-dep, offline)
+        run: npm run demo:memory

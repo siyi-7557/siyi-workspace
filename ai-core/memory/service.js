@@ -61,10 +61,13 @@ class MemoryService {
     if (!this._sessions.has(sessionId)) {
       this._sessions.set(sessionId, []);
     }
-    this._sessions.get(sessionId).push({
+    const arr = this._sessions.get(sessionId);
+    arr.push({
       ...message,
       timestamp: new Date().toISOString(),
     });
+    // 每个会话最多保留最近 50 条，避免长跑内存无限增长
+    if (arr.length > 50) arr.splice(0, arr.length - 50);
   }
 
   /**
