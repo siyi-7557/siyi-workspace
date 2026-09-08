@@ -31,6 +31,21 @@ cd /d "%~dp0clients\personal-ai" 2>nul || (
   exit /b 1
 )
 
+REM  环境检查：是否已安装 Node.js
+where node >nul 2>nul
+if errorlevel 1 (
+  echo.
+  echo  [错误] 未检测到 Node.js，无法安装依赖。
+  echo         请先安装 Node.js LTS 版：https://nodejs.org
+  echo         安装时请勾选「Add to PATH」，然后重新运行本脚本。
+  start "" "https://nodejs.org"
+  pause
+  exit /b 1
+)
+echo  [OK] 已检测到 Node.js 环境，继续。
+node -v
+echo.
+
 REM  第1步：安装依赖
 if exist node_modules (
   echo  [1/4] 依赖已安装，跳过。
