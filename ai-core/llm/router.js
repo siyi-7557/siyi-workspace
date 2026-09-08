@@ -9,6 +9,7 @@
 
 const https = require('https');
 const { URL } = require('url');
+const { Readable } = require('stream');
 
 // 模型配置
 const MODELS = {
@@ -47,6 +48,25 @@ class LLRouter {
       deepseek: options.deepseekApiKey || process.env.DEEPSEEK_API_KEY || '',
       alibaba: options.qwenApiKey || process.env.QWEN_API_KEY || '',
     };
+    // 无有效 LLM Key 时是否用 MockLLM 补全（demo 模式用，避免 HR 看不到「回答」这一步）
+    this.mockFallback = options.mockFallback || false;
+  }
+
+  /**
+   * 离线 Mock 回答：从 system 提示中提取「参考资料/长期记忆」生成一条基于资料的占位回答。
+   * 仅用于未配置任何 LLM Key 时的演示闭环，不发起任何网络请求。
+   */
+  _mockAnswer(messages) {
+    const convo = Array.isArray(messages) ? messages : [];
+    const system = (convo.find(m => m.role === 'system')?.content) || '';
+    const refs = (system.match(/## 参考资料[\s\S]*$/)?.[0] || '')
+      .split('\n').filter(l => l.trim() && !l.startsWith('#')).slice(0, 3).join('\n').trim();
+    const mem = (system.match(/## 长期记忆[\s\S]*$/)?.[0] || '')
+      .split('\n').filter(l => l.trim() && !l.startsWith('#')).slice(0, 2).join('\n').trim();
+    const parts = [];
+    if (refs) parts.push(`根据参考资料：\n${refs}`);
+    if (mem) parts.push(`结合长期记忆：${mem}`);
+    return `（离线演示回答 · 未配置 LLM Key）\n\n${parts.join('\n\n') || '未检索到相关资料。配置 ZHIPU_API_KEY 后可获得真实模型回答。'}`;
   }
 
   /**
@@ -93,6 +113,9 @@ class LLRouter {
     }
 
     if (!sawValidKey) {
+      if (this.mockFallback) {
+        return { choices: [{ message: { content: this._mockAnswer(messages) } }] };
+      }
       throw new Error('未配置可用的 LLM API Key。请在 clients/personal-ai/.env 填入 ZHIPU_API_KEY（或 DeepSeek / 通义千问任一）；视图、检索、记忆无需 Key。');
     }
     throw new Error(`所有模型调用失败: ${lastError?.message || '未知错误'}`);
@@ -264,7 +287,17 @@ class LLRouter {
       }
     }
     if (!sawValidKey) {
-      throw new Error('未配置可用的 LLM API Key。请在 clients/personal-ai/.env 填入 ZHIPU_API_KEY（或 DeepSeek / 通义千问任一）；视图、检索、记忆无需 Key。');
+      if (!this.mockFallback) {
+        throw new Error('未配置可用的 LLM API Key。请在 clients/personal-ai/.env 填入 ZHIPU_API_KEY（或 DeepSeek / 通义千问任一）；视图、检索、记忆无需 Key。');
+      }
+      const answer = this._mockAnswer(messages);
+      const mockStream = new Readable({ read() {} });
+      process.nextTick(() => {
+        mockStream.push(`data: ${JSON.stringify({ choices: [{ delta: { content: answer } }] })}\n\n`);
+        mockStream.push('data: [DONE]\n\n');
+        mockStream.push(null);
+      });
+      return mockStream;
     }
     throw new Error(`所有流式模型调用失败: ${lastError?.message || '未知错误'}`);
   }

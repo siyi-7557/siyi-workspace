@@ -39,7 +39,7 @@ npm run demo:full     # 入库→检索→记忆→工具→回答（全链路�
 >
 > **两条入口的分工**：
 > - `demo:web`（http://localhost:8789）：**零依赖、无需任何 key**，看「检索→记忆→工具→回答」四段式闭环 + RAG 评测面板。这是 **HR 看全流程效果走这条**。
-> - `demo:app`（http://localhost:8788）：**真实工作台完整界面**（侧边栏/统计卡/知识卡片），数据虚构；聊天需填 `ZHIPU_API_KEY`。
+> - `demo:app`（http://localhost:8788）：**真实工作台完整界面**（侧边栏/统计卡/知识卡片），数据虚构；聊天**未填 `ZHIPU_API_KEY` 时自动用离线 MockLLM 补全回答**，也能看完整闭环；填了则用真实模型。
 
 > **两个 API Key（都在 `clients/personal-ai/.env`，复制 `.env.example` 后填写，不会入库）**：
 > - `ZHIPU_API_KEY` —— **聊天/回答**用（智谱 GLM）。不填则聊天提示「未配置 Key」；视图/检索/记忆/评测**无需**。

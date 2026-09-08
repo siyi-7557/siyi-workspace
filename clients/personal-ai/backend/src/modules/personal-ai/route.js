@@ -37,6 +37,7 @@ async function getAICore() {
         zhipuApiKey: process.env.ZHIPU_API_KEY,
         deepseekApiKey: process.env.DEEPSEEK_API_KEY,
         qwenApiKey: process.env.QWEN_API_KEY,
+        mockFallback: process.env.APP_MODE === 'demo', // 无 LLM Key 时用 MockLLM 补全「回答」，HR 无需 key 也能看全流程
       },
       memory: { memoryDir: path.join(REPO_ROOT, 'data', 'memory') },
     });
