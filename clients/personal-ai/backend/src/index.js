@@ -60,6 +60,11 @@ const modulesDir = path.join(__dirname, 'modules');
 const loadedModules = [];
 if (fs.existsSync(modulesDir)) {
   fs.readdirSync(modulesDir).forEach(modName => {
+    // 私人「网站后台」模块：demo 模式一律跳过（本地磁盘可能仍保留该未跟踪目录）
+    if (modName === 'website' && config.isDemo()) {
+      console.log('[Module] Demo 模式跳过私人模块: website');
+      return;
+    }
     const modPath = path.join(modulesDir, modName);
     const indexPath = path.join(modPath, 'index.js');
     if (fs.statSync(modPath).isDirectory() && fs.existsSync(indexPath)) {
