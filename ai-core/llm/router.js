@@ -63,15 +63,17 @@ class LLRouter {
 
     // 按优先级尝试模型，自动降级
     let lastError = null;
+    let sawValidKey = false;
     for (const modelName of this.priority) {
       const model = MODELS[modelName];
       if (!model) continue;
 
       const apiKey = this.apiKeys[model.provider];
-      if (!apiKey) {
-        console.log(`[LLMRouter] 跳过 ${modelName}：未配置 API Key`);
+      if (!this._validApiKey(apiKey)) {
+        console.log(`[LLMRouter] 跳过 ${modelName}：未配置有效 API Key`);
         continue;
       }
+      sawValidKey = true;
 
       try {
         console.log(`[LLMRouter] 尝试模型: ${modelName}`);
@@ -90,6 +92,9 @@ class LLRouter {
       }
     }
 
+    if (!sawValidKey) {
+      throw new Error('未配置可用的 LLM API Key。请在 clients/personal-ai/.env 填入 ZHIPU_API_KEY（或 DeepSeek / 通义千问任一）；视图、检索、记忆无需 Key。');
+    }
     throw new Error(`所有模型调用失败: ${lastError?.message || '未知错误'}`);
   }
 
@@ -99,8 +104,13 @@ class LLRouter {
   getAvailableModels() {
     return this.priority.filter(name => {
       const model = MODELS[name];
-      return model && this.apiKeys[model.provider];
+      return model && this._validApiKey(this.apiKeys[model.provider]);
     });
+  }
+
+  /** 判断 Key 是否为有效值（排除空值和占位符） */
+  _validApiKey(key) {
+    return !!key && !/^your_/i.test(String(key).trim());
   }
 
   // ========== 内部方法 ==========
@@ -221,11 +231,13 @@ class LLRouter {
     const maxTokens = options.maxTokens || 4096;
 
     let lastError = null;
+    let sawValidKey = false;
     for (const modelName of this.priority) {
       const model = MODELS[modelName];
       if (!model) continue;
       const apiKey = this.apiKeys[model.provider];
-      if (!apiKey) continue;
+      if (!this._validApiKey(apiKey)) continue;
+      sawValidKey = true;
 
       try {
         console.log(`[LLMRouter] 流式尝试模型: ${modelName}`);
@@ -250,6 +262,9 @@ class LLRouter {
           throw err;
         }
       }
+    }
+    if (!sawValidKey) {
+      throw new Error('未配置可用的 LLM API Key。请在 clients/personal-ai/.env 填入 ZHIPU_API_KEY（或 DeepSeek / 通义千问任一）；视图、检索、记忆无需 Key。');
     }
     throw new Error(`所有流式模型调用失败: ${lastError?.message || '未知错误'}`);
   }
