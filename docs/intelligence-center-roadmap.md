@@ -94,12 +94,12 @@ CLOUD_ADMIN_PASSWORD=你的admin密码
 
 ## 相关文件位置
 
-- 后端模块：`G:\SIYI-Hermess\Siyi-OS\clients\personal-ai\backend\src\modules\website\`
+- 后端模块：`clients/personal-ai/backend/src/modules/website/`
   - `sync.js` — 数据同步
   - `insight.js` — 洞察生成
   - `route.js` — API 路由
   - `index.js` — 模块入口
-- 前端模块：`G:\SIYI-Hermess\Siyi-OS\clients\personal-ai\backend\public\modules\website\`
+- 前端模块：`clients/personal-ai/backend/public/modules/website/`
   - `module.js` — 前端逻辑
   - `style.css` — 样式
 - 数据库：Workspace 主数据库（`workbench.db`），表名前缀 `visitor_`

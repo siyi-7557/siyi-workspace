@@ -296,7 +296,7 @@ SSE 流式返回
 - [x] 端到端测试（洞察中心 e2e + 知识同步脚本验证）
 
 ### 阶段3：Personal AI 迁移
-- [ ] 从 G:\SIYI-Hermess\Siyi-OS\clients\personal-ai 迁移前端到 clients/personal-ai/frontend/
+- [ ] 从 <repo>/clients/personal-ai 迁移前端到 clients/personal-ai/frontend/
 - [ ] 迁移 Electron 主进程到 clients/personal-ai/electron/
 - [ ] 迁移后端到 clients/personal-ai/backend/
 - [ ] 接入私人工具（Obsidian/Prompt/复盘/待办）

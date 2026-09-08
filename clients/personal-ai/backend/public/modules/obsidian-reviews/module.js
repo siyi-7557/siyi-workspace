@@ -1187,7 +1187,7 @@ const ObsidianReviewsModule = {
       if (openBtn && data.fullPath) {
         openBtn.style.display = 'inline-flex';
         openBtn.addEventListener('click', () => {
-          const vaultPath = 'G:\\obsidian\\person pjl\\';
+          const vaultPath = '';
           let relPath = data.fullPath;
           if (relPath.startsWith(vaultPath)) {
             relPath = relPath.substring(vaultPath.length);
