@@ -25,6 +25,8 @@ git clone https://github.com/siyi-7557/siyi-workspace && cd siyi-workspace
 
 **最快方式**：Windows 双击根目录 **`start-demo.bat`**；macOS/Linux 执行 **`bash start-demo.sh`**。自动「装依赖 → 初始化 → 启动 → 打开浏览器」→ http://localhost:8788
 
+> 下面的 `npm run ...` 命令都**必须在仓库根目录**（`cd siyi-workspace` 之后、有 `package.json` 的那层）运行；一键脚本 `start-demo.bat` / `start-demo.sh` 会自动定位路径，无需先进入。`demo:web`/`demo:app` 是**常驻服务**，请在对应终端窗口保持运行（关闭即停止）。
+
 命令行直接跑：
 
 ```bash
