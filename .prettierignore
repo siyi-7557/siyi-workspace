@@ -1,0 +1,10 @@
+node_modules
+clients/meet-siyi
+clients/personal-ai/backend/public
+clients/personal-ai/backend/docs
+docs
+tools
+data
+_privacy-backup
+dist
+build

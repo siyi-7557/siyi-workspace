@@ -1,0 +1,38 @@
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "commonjs"
+  },
+  "extends": ["eslint:recommended", "prettier"],
+  "rules": {
+    "no-console": "off",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "no-empty": ["warn", { "allowEmptyCatch": true }],
+    "no-undef": "warn",
+    "no-constant-condition": "off",
+    "no-async-promise-executor": "off",
+    "no-useless-escape": "off",
+    "no-redeclare": "off",
+    "no-inner-declarations": "off"
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "clients/meet-siyi/**",
+    "clients/personal-ai/backend/public/**",
+    "clients/personal-ai/backend/docs/**",
+    "clients/personal-ai/backend/electron/**",
+    "docs/**",
+    "tools/**",
+    "data/**",
+    "_privacy-backup/**",
+    "dist/",
+    "build/",
+    "**/*.min.js",
+    "**/*.json"
+  ]
+}

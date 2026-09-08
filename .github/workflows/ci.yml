@@ -18,6 +18,12 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dev deps (eslint/prettier)
+        run: npm install
+
+      - name: Lint
+        run: npm run lint
+
       - name: Syntax check entry files
         run: |
           node --check ai-core/index.js
