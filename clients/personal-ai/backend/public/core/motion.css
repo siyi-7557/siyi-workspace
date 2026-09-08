@@ -1,0 +1,360 @@
+/* ============================================================
+ * motion.css — 思意工作台交互动效增强
+ * 独立文件，仅补充动效，不覆盖基础样式
+ * 设计原则：克制、优雅、快速（150-300ms）、cubic-bezier 缓动
+ * ============================================================ */
+
+:root {
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --motion-slow: 320ms;
+}
+
+/* ===== 1. 页面切换动效 ===== */
+/* 注意：不能用 transform，否则会破坏子元素的 position: fixed（如抽屉、模态框） */
+.content-inner {
+  animation: pageEnter var(--motion-slow) var(--motion-ease-out) both;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 页面内子元素 stagger 进入（由 JS 添加 .motion-stagger 类） */
+.motion-stagger > * {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: staggerIn var(--motion-base) var(--motion-ease-out) forwards;
+}
+
+.motion-stagger > *:nth-child(1) { animation-delay: 40ms; }
+.motion-stagger > *:nth-child(2) { animation-delay: 80ms; }
+.motion-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.motion-stagger > *:nth-child(4) { animation-delay: 160ms; }
+.motion-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.motion-stagger > *:nth-child(6) { animation-delay: 240ms; }
+.motion-stagger > *:nth-child(7) { animation-delay: 280ms; }
+.motion-stagger > *:nth-child(8) { animation-delay: 320ms; }
+.motion-stagger > *:nth-child(n+9) { animation-delay: 360ms; }
+
+@keyframes staggerIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 2. 侧边栏导航动效 ===== */
+.nav-item {
+  position: relative;
+  transition: background var(--motion-fast) var(--motion-ease),
+              color var(--motion-fast) var(--motion-ease),
+              padding-left var(--motion-base) var(--motion-ease);
+}
+
+.nav-item:hover {
+  padding-left: calc(var(--sidebar-pad, 12px) + 3px);
+}
+
+.nav-item .nav-icon {
+  transition: transform var(--motion-base) var(--motion-ease),
+              opacity var(--motion-fast) var(--motion-ease);
+}
+
+.nav-item:hover .nav-icon {
+  transform: scale(1.08);
+}
+
+/* active 左侧指示条展开动画 */
+.nav-item.active::before {
+  animation: indicatorExpand var(--motion-base) var(--motion-ease-out) both;
+}
+
+@keyframes indicatorExpand {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* 侧边栏分组折叠动画 */
+.sidebar-section .sidebar-nav {
+  overflow: hidden;
+  transition: max-height var(--motion-base) var(--motion-ease),
+              opacity var(--motion-base) var(--motion-ease);
+}
+
+/* ===== 3. 卡片动效 ===== */
+.card,
+[class*="card"]:not([class*="card-"]):not(.card-header):not(.card-title):not(.card-body):not(.card-footer):not(.card-grid):not(.card-list):not(.card-container):not(.card-wrapper) {
+  transition: transform var(--motion-base) var(--motion-ease),
+              box-shadow var(--motion-base) var(--motion-ease),
+              border-color var(--motion-base) var(--motion-ease),
+              background var(--motion-fast) var(--motion-ease);
+}
+
+.card-hover:hover,
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card:active,
+.card-hover:active {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: 80ms;
+}
+
+/* 知识/复盘/提示词列表项 */
+.knowledge-item,
+.review-item,
+.prompt-item,
+.radar-item,
+.list-item {
+  transition: transform var(--motion-fast) var(--motion-ease),
+              background var(--motion-fast) var(--motion-ease),
+              border-color var(--motion-fast) var(--motion-ease),
+              box-shadow var(--motion-fast) var(--motion-ease);
+}
+
+.knowledge-item:hover,
+.review-item:hover,
+.prompt-item:hover,
+.radar-item:hover,
+.list-item:hover {
+  transform: translateX(3px);
+}
+
+/* ===== 4. 按钮动效 ===== */
+button,
+.btn,
+[class*="btn"]:not([class*="btn-group"]):not(.btn-icon-only),
+.header-icon-btn {
+  transition: transform 100ms var(--motion-ease),
+              background var(--motion-fast) var(--motion-ease),
+              color var(--motion-fast) var(--motion-ease),
+              box-shadow var(--motion-fast) var(--motion-ease),
+              border-color var(--motion-fast) var(--motion-ease);
+}
+
+button:active,
+.btn:active,
+.header-icon-btn:active {
+  transform: scale(0.95);
+  transition-duration: 80ms;
+}
+
+/* 主按钮悬停微光 */
+.btn-primary:hover,
+button.primary:hover {
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.25);
+}
+
+/* ===== 5. 模态框动效 ===== */
+.modal-overlay {
+  transition: opacity var(--motion-base) var(--motion-ease);
+}
+
+.modal-overlay .modal-box {
+  animation: modalEnter var(--motion-base) var(--motion-ease-out) both;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== 6. 抽屉/底部面板动效 ===== */
+.drawer,
+.sheet,
+[class*="drawer"],
+[class*="sheet"]:not(.sheet-music) {
+  transition: transform var(--motion-slow) var(--motion-ease-out),
+              opacity var(--motion-base) var(--motion-ease);
+}
+
+/* 知识详情底部弹出 */
+.knowledge-detail,
+.detail-panel,
+.bottom-sheet {
+  animation: sheetUp var(--motion-slow) var(--motion-ease-out) both;
+}
+
+@keyframes sheetUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 7. Toast 动效 ===== */
+.toast-container .toast {
+  animation: toastIn var(--motion-base) var(--motion-ease-out) both;
+}
+
+.toast-container .toast.toast-leaving {
+  animation: toastOut var(--motion-base) var(--motion-ease) both;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastOut {
+  to {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+}
+
+/* ===== 8. 滚动渐入（JS 添加 .reveal 类） ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--motion-slow) var(--motion-ease-out),
+              transform var(--motion-slow) var(--motion-ease-out);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== 9. 输入框聚焦动效 ===== */
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input:not([type]),
+textarea,
+select {
+  transition: border-color var(--motion-fast) var(--motion-ease),
+              box-shadow var(--motion-fast) var(--motion-ease),
+              background var(--motion-fast) var(--motion-ease);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+/* 顶部搜索框聚焦扩展 */
+.header-search {
+  transition: width var(--motion-base) var(--motion-ease),
+              box-shadow var(--motion-fast) var(--motion-ease),
+              border-color var(--motion-fast) var(--motion-ease);
+}
+
+/* ===== 10. 标签/徽章动效 ===== */
+.tag,
+.badge,
+[class*="tag"]:not([class*="tag-cloud"]):not(.tag-list),
+[class*="badge"] {
+  transition: transform var(--motion-fast) var(--motion-ease),
+              background var(--motion-fast) var(--motion-ease),
+              color var(--motion-fast) var(--motion-ease);
+}
+
+.tag:hover,
+.badge:hover {
+  transform: scale(1.05);
+}
+
+/* ===== 11. 骨架屏加载动画 ===== */
+.skeleton,
+[class*="skeleton"] {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary, #f5f5f7) 25%,
+    var(--bg-tertiary, #ebebef) 50%,
+    var(--bg-secondary, #f5f5f7) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== 12. 加载旋转器优化 ===== */
+.loading-spinner {
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== 13. 侧边栏状态点呼吸 ===== */
+.status-dot {
+  animation: none;
+}
+
+.status-dot.synced {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ===== 14. 总览页面自动轮播指示器 ===== */
+.carousel-dot,
+.indicator-dot,
+[class*="carousel-dot"],
+[class*="indicator-dot"] {
+  transition: width var(--motion-base) var(--motion-ease),
+              background var(--motion-base) var(--motion-ease),
+              opacity var(--motion-fast) var(--motion-ease);
+}
+
+/* ===== 15. 链接下划线动效 ===== */
+a:not(.nav-item):not(.btn):not([class*="card"]) {
+  transition: color var(--motion-fast) var(--motion-ease);
+}
+
+/* ===== 16. 减少动效偏好 ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

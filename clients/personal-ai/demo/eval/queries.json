@@ -1,0 +1,12 @@
+[
+  { "id": "q1", "query": "RAG 召回率评估怎么做？有哪些指标？", "gold": ["rag-playbook.md"] },
+  { "id": "q2", "query": "我们的技术栈用了哪些数据库和语言？", "gold": ["engineering-stack.md"] },
+  { "id": "q3", "query": "新人入职第一天要做什么？", "gold": ["onboarding-welcome.md"] },
+  { "id": "q4", "query": "如何做数据血缘和元数据管理？", "gold": ["data-governance.md"] },
+  { "id": "q5", "query": "代码评审和 CI 的流程是怎样的？", "gold": ["engineering-practices.md"] },
+  { "id": "q6", "query": "GDPR 和数据加密合规要求", "gold": ["security-compliance.md"] },
+  { "id": "q7", "query": "监控告警和日志指标怎么配置？", "gold": ["observability.md"] },
+  { "id": "q8", "query": "核心产品 Workbench 是做什么的？", "gold": ["product-core.md"] },
+  { "id": "q9", "query": "Workbench 和 Meet 有什么区别", "gold": ["product-core.md"] },
+  { "id": "q10", "query": "CI/CD 和测试策略", "gold": ["engineering-practices.md"] }
+]

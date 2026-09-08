@@ -1,0 +1,1068 @@
+/* ===== Information Radar 模块样式 — 思意设计系统 ===== */
+
+.radar-container {
+  max-width: var(--siyi-content-max, 1100px);
+  margin: 0 auto;
+  padding: var(--spacing-6) var(--spacing-6) var(--spacing-12);
+  font-family: var(--font-sans);
+}
+
+/* ===== 页面 Header ===== */
+.radar-header {
+  background: rgba(141, 124, 199, 0.04);
+  border: 1px solid rgba(45, 42, 53, 0.05);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  margin-bottom: var(--spacing-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.radar-header-text {
+  flex: 1;
+}
+
+.radar-title {
+  font-size: var(--type-scale-3xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-1);
+  line-height: var(--line-height-tight);
+}
+
+.radar-subtitle {
+  font-size: var(--type-scale-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--line-height-normal);
+}
+
+.radar-header-status {
+  font-size: var(--type-scale-sm);
+  color: var(--color-text-muted);
+  text-align: right;
+  max-width: 320px;
+}
+
+/* ===== 顶部操作区 ===== */
+.radar-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-5);
+}
+
+/* 搜索框 */
+.radar-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 420px;
+}
+
+.radar-search-box svg {
+  position: absolute;
+  left: var(--spacing-3);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.radar-search-box input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--spacing-3) 0 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+  color: var(--color-text-primary);
+  font-size: var(--type-scale-base);
+  font-family: inherit;
+  transition: all 150ms ease-out;
+}
+
+.radar-search-box input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.radar-search-box input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-ring);
+}
+
+/* 操作按钮组 */
+.radar-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  position: relative;
+}
+
+/* Outline 按钮 */
+.radar-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  height: 36px;
+  padding: 0 var(--spacing-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+  color: var(--color-text-secondary);
+  font-size: var(--type-scale-base);
+  font-weight: var(--font-weight-medium);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease-out;
+}
+
+.radar-btn-outline:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(141, 124, 199, 0.04);
+}
+
+.radar-btn-outline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.radar-btn-outline svg.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 图标按钮 */
+.radar-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 150ms ease-out;
+  flex-shrink: 0;
+}
+
+.radar-icon-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(141, 124, 199, 0.04);
+}
+
+/* 更多菜单 */
+.radar-more-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 160px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-1);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radar-more-menu.hidden {
+  display: none;
+}
+
+.radar-more-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--type-scale-base);
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 120ms ease-out;
+  text-align: left;
+}
+
+.radar-more-item:hover {
+  background: var(--color-muted);
+  color: var(--color-text-primary);
+}
+
+/* ===== 分类 Tabs ===== */
+.radar-tabs {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-5);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.radar-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 6px var(--spacing-4);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-size: var(--type-scale-base);
+  font-weight: var(--font-weight-medium);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease-out;
+}
+
+.radar-tab:hover {
+  background: var(--color-muted);
+  color: var(--color-text-secondary);
+}
+
+.radar-tab.active {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  font-weight: var(--font-weight-semibold);
+}
+
+.radar-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  font-size: var(--type-scale-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  border-radius: var(--radius-pill);
+  background: var(--color-muted);
+  color: var(--color-text-muted);
+}
+
+.radar-tab.active .radar-tab-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-primary-foreground);
+}
+
+/* ===== 信息卡片网格 ===== */
+.radar-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-4);
+}
+
+.radar-card-more-hint {
+  grid-column: 1 / -1;
+  padding: 10px 12px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--type-scale-sm);
+  text-align: center;
+}
+
+/* 信息卡片 */
+.radar-item-card {
+  position: relative;
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 180ms ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.radar-item-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.radar-item-card.read {
+  opacity: 0.75;
+}
+
+/* 卡片右上角更多按钮 */
+.radar-card-more {
+  position: absolute;
+  top: var(--spacing-3);
+  right: var(--spacing-3);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 120ms ease-out;
+  opacity: 0;
+}
+
+.radar-item-card:hover .radar-card-more {
+  opacity: 1;
+}
+
+.radar-card-more:hover {
+  background: var(--color-muted);
+  color: var(--color-text-secondary);
+}
+
+/* 卡片顶部：来源 + 相关度 */
+.radar-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 24px;
+}
+
+.radar-card-source {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.radar-source-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.radar-source-avatar span {
+  color: #fff;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.radar-source-name {
+  font-size: var(--type-scale-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.radar-card-relevance {
+  font-size: var(--type-scale-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  padding: 2px 8px;
+  background: rgba(141, 124, 199, 0.1);
+  border-radius: var(--radius-pill);
+  line-height: 1.5;
+}
+
+/* 卡片中部：标题 + 摘要 */
+.radar-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.radar-card-title {
+  font-size: var(--type-scale-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: var(--line-height-snug);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.radar-card-summary {
+  font-size: var(--type-scale-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 为什么推荐提示条 */
+.radar-card-why {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: rgba(141, 124, 199, 0.06);
+  border-radius: var(--radius-sm);
+  font-size: var(--type-scale-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.radar-why-icon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* 卡片底部：时间 + 书签 */
+.radar-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: var(--spacing-1);
+}
+
+.radar-card-time {
+  font-size: var(--type-scale-sm);
+  color: var(--color-text-muted);
+}
+
+.radar-card-bookmark {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 120ms ease-out;
+}
+
+.radar-card-bookmark:hover {
+  color: var(--color-primary);
+  background: rgba(141, 124, 199, 0.08);
+}
+
+.radar-card-bookmark.saved {
+  color: var(--color-primary);
+}
+
+/* ===== 详情 Drawer ===== */
+.radar-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.radar-drawer.hidden {
+  display: none;
+}
+
+.radar-drawer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(45, 42, 53, 0.3);
+  backdrop-filter: blur(2px);
+}
+
+.radar-drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 560px;
+  max-width: 90vw;
+  background: var(--color-card);
+  box-shadow: -4px 0 24px rgba(45, 42, 53, 0.08);
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 200ms ease-out;
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.radar-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--spacing-5) var(--spacing-6);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--spacing-4);
+}
+
+.radar-drawer-title {
+  font-size: var(--type-scale-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+  flex: 1;
+  line-height: var(--line-height-snug);
+}
+
+.radar-drawer-close {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--type-scale-lg);
+  cursor: pointer;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  transition: all 120ms ease-out;
+  flex-shrink: 0;
+}
+
+.radar-drawer-close:hover {
+  background: var(--color-muted);
+  color: var(--color-text-primary);
+}
+
+.radar-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-5) var(--spacing-6);
+}
+
+.radar-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.radar-detail-category {
+  padding: 2px 10px;
+  background: rgba(141, 124, 199, 0.1);
+  color: var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-size: var(--type-scale-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.radar-detail-source {
+  font-size: var(--type-scale-sm);
+  color: var(--color-text-muted);
+}
+
+.radar-detail-relevance {
+  font-size: var(--type-scale-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.radar-detail-summary {
+  padding: var(--spacing-4);
+  background: var(--color-muted);
+  border-radius: var(--radius-md);
+  font-size: var(--type-scale-md);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-4);
+}
+
+.radar-detail-content {
+  font-size: var(--type-scale-md);
+  color: var(--color-text-primary);
+  line-height: 1.8;
+  margin-bottom: var(--spacing-5);
+}
+
+.radar-detail-why {
+  padding: var(--spacing-4);
+  background: rgba(141, 124, 199, 0.06);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-4);
+}
+
+.radar-detail-why h4 {
+  font-size: var(--type-scale-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  margin: 0 0 var(--spacing-2);
+}
+
+.radar-detail-why p {
+  font-size: var(--type-scale-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.radar-detail-url {
+  margin-top: var(--spacing-4);
+}
+
+.radar-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: var(--type-scale-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.radar-link:hover {
+  text-decoration: underline;
+}
+
+.radar-drawer-footer {
+  display: flex;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4) var(--spacing-6);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-card);
+}
+
+.radar-drawer-footer .btn {
+  flex: 1;
+}
+
+/* 详情标签 / 关联 */
+.radar-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--spacing-4);
+}
+
+.radar-tag {
+  padding: 2px 10px;
+  background: var(--color-muted);
+  border-radius: var(--radius-pill);
+  font-size: var(--type-scale-xs);
+  color: var(--color-text-secondary);
+}
+
+.radar-detail-related {
+  margin-bottom: var(--spacing-4);
+}
+
+.radar-detail-related h4 {
+  font-size: var(--type-scale-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-2);
+}
+
+.radar-related-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.radar-related-tag {
+  padding: 3px 10px;
+  background: rgba(141, 124, 199, 0.1);
+  color: var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-size: var(--type-scale-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ===== 信息源管理 ===== */
+.radar-sources-list {
+  margin-bottom: var(--spacing-6);
+}
+
+.radar-sources-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.radar-source-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: all 120ms ease-out;
+}
+
+.radar-source-item:hover {
+  border-color: rgba(45, 42, 53, 0.12);
+}
+
+.radar-source-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.radar-source-name {
+  font-size: var(--type-scale-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.radar-source-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--type-scale-sm);
+  color: var(--color-text-muted);
+}
+
+.radar-source-type {
+  padding: 1px 6px;
+  background: var(--color-muted);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+}
+
+.radar-source-url {
+  overflow: hidden;
+  text-decoration: none;
+  white-space: nowrap;
+  max-width: 240px;
+}
+
+.radar-source-sub {
+  font-size: var(--type-scale-xs);
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.radar-source-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-left: var(--spacing-3);
+}
+
+.radar-source-delete {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--type-scale-md);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: all 120ms ease-out;
+}
+
+.radar-source-delete:hover {
+  background: rgba(176, 96, 104, 0.1);
+  color: var(--color-destructive);
+}
+
+/* 添加信息源表单 */
+.radar-add-source {
+  padding-top: var(--spacing-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.radar-add-source-title {
+  font-size: var(--type-scale-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-4);
+}
+
+.radar-form-group {
+  margin-bottom: var(--spacing-3);
+}
+
+.radar-form-label {
+  display: block;
+  font-size: var(--type-scale-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+
+.radar-form-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--type-scale-base);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  transition: all 120ms ease-out;
+  box-sizing: border-box;
+}
+
+.radar-form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-ring);
+}
+
+.radar-add-source-btn {
+  width: 100%;
+  margin-top: var(--spacing-2);
+}
+
+/* 表单辅助 */
+.radar-form-hint {
+  font-size: var(--type-scale-sm);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-3);
+}
+
+.radar-form-row {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+.radar-form-row .radar-form-group {
+  flex: 1;
+}
+
+.radar-form-textarea {
+  resize: vertical;
+  min-height: 44px;
+  line-height: 1.6;
+}
+
+/* 偏好来源 chips */
+.radar-pref-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.radar-pref-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-size: var(--type-scale-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 130ms ease-out;
+}
+
+.radar-pref-source input {
+  display: none;
+}
+
+.radar-pref-source.on {
+  border-color: var(--color-primary);
+  background: rgba(141, 124, 199, 0.08);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* 信息源项增强 */
+.radar-source-item.is-off {
+  opacity: 0.55;
+}
+
+.radar-source-test {
+  margin-top: 6px;
+  font-size: var(--type-scale-sm);
+}
+
+.radar-source-test.ok {
+  color: var(--color-success);
+}
+
+.radar-source-test.fail {
+  color: var(--color-destructive);
+}
+
+.radar-source-item.editing {
+  display: block;
+}
+
+.radar-source-edit-actions {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.radar-source-icon-btn {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--type-scale-xs);
+  cursor: pointer;
+  transition: all 130ms ease-out;
+}
+
+.radar-source-icon-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-sm {
+  padding: 5px 12px !important;
+  font-size: var(--type-scale-sm) !important;
+}
+
+/* 启用开关 */
+.radar-switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+  flex: none;
+}
+
+.radar-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radar-switch-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(45, 42, 53, 0.2);
+  border-radius: 20px;
+  transition: 180ms;
+  cursor: pointer;
+}
+
+.radar-switch-slider::before {
+  content: "";
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 180ms;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.radar-switch input:checked + .radar-switch-slider {
+  background: var(--color-primary);
+}
+
+.radar-switch input:checked + .radar-switch-slider::before {
+  transform: translateX(14px);
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-12) var(--spacing-6);
+  text-align: center;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: var(--spacing-4);
+}
+
+.empty-state h3 {
+  font-size: var(--type-scale-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-2);
+}
+
+.empty-state p {
+  font-size: var(--type-scale-base);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+  .radar-container {
+    padding: var(--spacing-4) var(--spacing-4) var(--spacing-10);
+  }
+
+  .radar-header {
+    flex-direction: column;
+    gap: var(--spacing-3);
+    align-items: flex-start;
+  }
+
+  .radar-header-status {
+    text-align: left;
+    max-width: none;
+  }
+
+  .radar-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .radar-search-box {
+    max-width: none;
+  }
+
+  .radar-toolbar-actions {
+    justify-content: flex-end;
+  }
+
+  .radar-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 2px;
+  }
+
+  .radar-tab {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .radar-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .radar-drawer-panel {
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  .radar-form-row {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+}
+
+@media (max-width: 480px) {
+  .radar-btn-outline span:last-child {
+    display: none;
+  }
+
+  .radar-btn-outline {
+    padding: 0 var(--spacing-3);
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "siyi-os",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Siyi OS —— 一个 AI Core，两个入口。个人 AI 工作台 + 公网数字伙伴。评估 / 招聘演示请用下面的 demo:* 脚本（零依赖、无需 API Key）。",
+  "scripts": {
+    "demo:web": "npm --prefix clients/personal-ai run demo:web",
+    "demo:app": "npm --prefix clients/personal-ai run demo:app",
+    "demo:init": "npm --prefix clients/personal-ai run demo:init",
+    "demo:eval": "npm --prefix clients/personal-ai run demo:eval",
+    "eval:rag": "npm --prefix clients/personal-ai run eval:rag",
+    "demo:memory": "npm --prefix clients/personal-ai run demo:memory",
+    "demo:agent": "npm --prefix clients/personal-ai run demo:agent",
+    "demo:full": "npm --prefix clients/personal-ai run demo:full"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}

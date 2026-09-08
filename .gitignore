@@ -1,0 +1,47 @@
+# 系统/编辑器杂项
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.log
+
+# 密钥与本地配置（绝不入库！API Key 只放 .env）
+.env
+.env.*
+!.env.example
+
+# 本地数据库（绝不入库！个人工作台数据）
+*.db
+*.db-shm
+*.db-wal
+
+# 依赖
+node_modules/
+
+# 运行时数据（事件/记忆/知识候选，由系统生成）
+data/
+
+# 备份目录
+_backup*/
+.backup*/
+*.bak
+
+# 临时脚本
+tmp/
+
+# ---- 个人 / 私密 / 开发产物（仅本机，不公开）-----------------------------
+_privacy-backup/
+fix_buttons.py
+fix_filter.py
+项目开发进展*
+BUILD-LOG*
+WORKBENCH-PLAN*
+个人简历*
+*insert-test-visitor*.js
+*_test-inject*.js
+*_test-stream-events*.js
+phase9-*.ps1
+*设计令牌审计*
+*代码盘点*
+*ai-assistant-audit-report*
+*about-now-content-audit*
+*siyi-avatar-test*

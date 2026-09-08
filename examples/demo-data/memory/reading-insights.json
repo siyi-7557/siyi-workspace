@@ -1,0 +1,11 @@
+{
+  "key": "reading-insights",
+  "value": "从近两周的雷达阅读记录看：RAG 相关内容读了 6 篇、记忆系统 2 篇、前端工具 1 篇。RAG 中最关注召回率评测方法（recall@k、MRR），其次是 Embedding 选型。已经开始把学到的方法用到自己的评测集上。",
+  "metadata": {
+    "title": "阅读洞察",
+    "type": "long-term",
+    "tags": ["洞察", "RAG", "评测"]
+  },
+  "createdAt": "2026-08-30T10:00:00.000Z",
+  "updatedAt": "2026-08-30T10:00:00.000Z"
+}

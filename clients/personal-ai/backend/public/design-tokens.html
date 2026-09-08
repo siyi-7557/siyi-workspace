@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设计令牌 v2 — 思意工作台</title>
+  <link rel="stylesheet" href="/core/main.css">
+  <style>
+    body {
+      background: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      padding: 40px 24px 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-divider);
+    }
+    .page-title {
+      font-size: var(--fs-display);
+      font-weight: var(--weight-semibold);
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+    .page-subtitle {
+      font-size: var(--fs-body);
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .section {
+      margin-bottom: 56px;
+    }
+    .section-title {
+      font-size: var(--fs-heading);
+      font-weight: var(--weight-semibold);
+      margin: 0 0 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-divider);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title .badge {
+      font-size: var(--fs-micro);
+      font-weight: var(--weight-medium);
+      padding: 2px 8px;
+      background: var(--accent-tint);
+      color: var(--accent);
+      border-radius: var(--radius-pill);
+    }
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .token-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all var(--transition-fast);
+    }
+    .token-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-sm);
+    }
+    .token-swatch {
+      height: 72px;
+      border-bottom: 1px solid var(--border-divider);
+    }
+    .token-info {
+      padding: 10px 12px;
+    }
+    .token-name {
+      font-size: var(--fs-caption);
+      font-weight: var(--weight-medium);
+      color: var(--text-primary);
+      margin: 0 0 4px;
+      font-family: var(--font-mono);
+      word-break: break-all;
+    }
+    .token-value {
+      font-size: var(--fs-micro);
+      color: var(--text-muted);
+      margin: 0;
+      font-family: var(--font-mono);
+    }
+    /* 排版展示 */
+    .type-showcase {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 12px;
+    }
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-divider);
+    }
+    .type-row:last-child {
+      border-bottom: none;
+    }
+    .type-label {
+      width: 120px;
+      flex-shrink: 0;
+      font-size: var(--fs-micro);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .type-sample {
+      flex: 1;
+      color: var(--text-primary);
+    }
+    /* 间距展示 */
+    .space-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0;
+    }
+    .space-label {
+      width: 100px;
+      flex-shrink: 0;
+      font-size: var(--fs-micro);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .space-bar {
+      height: 24px;
+      background: var(--accent-tint);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--fs-micro);
+      color: var(--accent);
+      font-weight: var(--weight-medium);
+    }
+    /* 圆角展示 */
+    .radius-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+    }
+    .radius-item {
+      text-align: center;
+    }
+    .radius-box {
+      width: 80px;
+      height: 80px;
+      background: var(--accent-tint);
+      border: 2px solid var(--accent);
+      margin: 0 auto 8px;
+    }
+    .radius-label {
+      font-size: var(--fs-micro);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    /* 阴影展示 */
+    .shadow-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+    }
+    .shadow-item {
+      text-align: center;
+      padding: 20px;
+    }
+    .shadow-box {
+      width: 100%;
+      height: 80px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+    }
+    .shadow-label {
+      font-size: var(--fs-micro);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    /* 动效展示 */
+    .motion-demo {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .motion-item {
+      text-align: center;
+    }
+    .motion-box {
+      width: 60px;
+      height: 60px;
+      background: var(--accent);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      transition: transform var(--transition-base);
+    }
+    .motion-item:hover .motion-box {
+      transform: scale(1.15) rotate(5deg);
+    }
+    .motion-label {
+      font-size: var(--fs-micro);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    /* 布局展示 */
+    .layout-demo {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 24px;
+    }
+    .layout-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-divider);
+    }
+    .layout-row:last-child {
+      border-bottom: none;
+    }
+    .layout-name {
+      font-size: var(--fs-caption);
+      font-weight: var(--weight-medium);
+      font-family: var(--font-mono);
+    }
+    .layout-value {
+      font-size: var(--fs-caption);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    /* 暗色主题切换 */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      font-size: var(--fs-caption);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      z-index: 100;
+    }
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()">🌙 切换主题</button>
+
+  <div class="page-header">
+    <h1 class="page-title">设计令牌 v2</h1>
+    <p class="page-subtitle">思意工作台 · Personal AI Workspace · Quiet · Personal · Soft · Editorial · Intelligent</p>
+  </div>
+
+  <!-- 色彩系统 -->
+  <div class="section">
+    <h2 class="section-title">色彩系统 <span class="badge">Color</span></h2>
+    
+    <h3 style="font-size:var(--fs-body);font-weight:var(--weight-medium);margin:24px 0 12px;color:var(--text-secondary);">背景层级</h3>
+    <div class="token-grid">
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--bg-app);"></div>
+        <div class="token-info">
+          <p class="token-name">--bg-app</p>
+          <p class="token-value">#F7F6FB</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--bg-surface);border-bottom:1px solid var(--border-divider);"></div>
+        <div class="token-info">
+          <p class="token-name">--bg-surface</p>
+          <p class="token-value">#FFFFFF</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--bg-subtle);"></div>
+        <div class="token-info">
+          <p class="token-name">--bg-subtle</p>
+          <p class="token-value">#FAF9FC</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--bg-muted);"></div>
+        <div class="token-info">
+          <p class="token-name">--bg-muted</p>
+          <p class="token-value">rgba(45,42,53,0.03)</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--bg-hover);"></div>
+        <div class="token-info">
+          <p class="token-name">--bg-hover</p>
+          <p class="token-value">rgba(45,42,53,0.02)</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:var(--fs-body);font-weight:var(--weight-medium);margin:24px 0 12px;color:var(--text-secondary);">文字</h3>
+    <div class="token-grid">
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--text-primary);"></div>
+        <div class="token-info">
+          <p class="token-name">--text-primary</p>
+          <p class="token-value">#2D2A35</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--text-secondary);"></div>
+        <div class="token-info">
+          <p class="token-name">--text-secondary</p>
+          <p class="token-value">#6B6875</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--text-muted);"></div>
+        <div class="token-info">
+          <p class="token-name">--text-muted</p>
+          <p class="token-value">#9A97A3</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--text-disabled);"></div>
+        <div class="token-info">
+          <p class="token-name">--text-disabled</p>
+          <p class="token-value">#C4C0D0</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:var(--fs-body);font-weight:var(--weight-medium);margin:24px 0 12px;color:var(--text-secondary);">强调色</h3>
+    <div class="token-grid">
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--accent);"></div>
+        <div class="token-info">
+          <p class="token-name">--accent</p>
+          <p class="token-value">#7A5ECD</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--accent-hover);"></div>
+        <div class="token-info">
+          <p class="token-name">--accent-hover</p>
+          <p class="token-value">#8B6FE0</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--accent-pressed);"></div>
+        <div class="token-info">
+          <p class="token-name">--accent-pressed</p>
+          <p class="token-value">#6A4EC0</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--accent-tint);"></div>
+        <div class="token-info">
+          <p class="token-name">--accent-tint</p>
+          <p class="token-value">rgba(122,94,205,0.06)</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--accent-ring);"></div>
+        <div class="token-info">
+          <p class="token-name">--accent-ring</p>
+          <p class="token-value">rgba(122,94,205,0.25)</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:var(--fs-body);font-weight:var(--weight-medium);margin:24px 0 12px;color:var(--text-secondary);">状态色</h3>
+    <div class="token-grid">
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--success);"></div>
+        <div class="token-info">
+          <p class="token-name">--success</p>
+          <p class="token-value">#5B8C6E</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--warning);"></div>
+        <div class="token-info">
+          <p class="token-name">--warning</p>
+          <p class="token-value">#B8865A</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--danger);"></div>
+        <div class="token-info">
+          <p class="token-name">--danger</p>
+          <p class="token-value">#B06068</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--info);"></div>
+        <div class="token-info">
+          <p class="token-name">--info</p>
+          <p class="token-value">#5A8AA8</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:var(--fs-body);font-weight:var(--weight-medium);margin:24px 0 12px;color:var(--text-secondary);">边框</h3>
+    <div class="token-grid">
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--border-divider);"></div>
+        <div class="token-info">
+          <p class="token-name">--border-divider</p>
+          <p class="token-value">rgba(45,42,53,0.06)</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--border-default);"></div>
+        <div class="token-info">
+          <p class="token-name">--border-default</p>
+          <p class="token-value">rgba(45,42,53,0.08)</p>
+        </div>
+      </div>
+      <div class="token-card">
+        <div class="token-swatch" style="background:var(--border-strong);"></div>
+        <div class="token-info">
+          <p class="token-name">--border-strong</p>
+          <p class="token-value">rgba(45,42,53,0.12)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 排版系统 -->
+  <div class="section">
+    <h2 class="section-title">排版系统 <span class="badge">Typography</span></h2>
+    <div class="type-showcase">
+      <div class="type-row">
+        <span class="type-label">--fs-display</span>
+        <span class="type-sample" style="font-size:var(--fs-display);font-weight:var(--weight-semibold);line-height:var(--leading-display);">思意工作台 Display 24px</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--fs-title</span>
+        <span class="type-sample" style="font-size:var(--fs-title);font-weight:var(--weight-semibold);line-height:var(--leading-title);">页面标题 Title 20px</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--fs-heading</span>
+        <span class="type-sample" style="font-size:var(--fs-heading);font-weight:var(--weight-semibold);line-height:var(--leading-heading);">区块标题 Heading 17px</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--fs-body</span>
+        <span class="type-sample" style="font-size:var(--fs-body);font-weight:var(--weight-normal);line-height:var(--leading-body);">正文内容 Body 14px — 这是正文的标准字号和行高，用于大部分阅读场景。</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--fs-caption</span>
+        <span class="type-sample" style="font-size:var(--fs-caption);font-weight:var(--weight-normal);line-height:var(--leading-caption);">辅助说明 Caption 13px</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--fs-micro</span>
+        <span class="type-sample" style="font-size:var(--fs-micro);font-weight:var(--weight-medium);line-height:var(--leading-micro);">标签/徽标 Micro 11px</span>
+      </div>
+    </div>
+    <div class="type-showcase" style="margin-top:12px;">
+      <div class="type-row">
+        <span class="type-label">--weight-normal</span>
+        <span class="type-sample" style="font-weight:var(--weight-normal);">常规 400 — 正文内容</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--weight-medium</span>
+        <span class="type-sample" style="font-weight:var(--weight-medium);">中等 500 — 强调/标签</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--weight-semibold</span>
+        <span class="type-sample" style="font-weight:var(--weight-semibold);">半粗 600 — 标题</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 间距系统 -->
+  <div class="section">
+    <h2 class="section-title">间距系统 <span class="badge">Spacing · 4px 基础</span></h2>
+    <div class="type-showcase">
+      <div class="space-row">
+        <span class="space-label">--space-xs</span>
+        <div class="space-bar" style="width:4px;">4</div>
+      </div>
+      <div class="space-row">
+        <span class="space-label">--space-sm</span>
+        <div class="space-bar" style="width:8px;">8</div>
+      </div>
+      <div class="space-row">
+        <span class="space-label">--space-md</span>
+        <div class="space-bar" style="width:12px;">12</div>
+      </div>
+      <div class="space-row">
+        <span class="space-label">--space-lg</span>
+        <div class="space-bar" style="width:16px;">16</div>
+      </div>
+      <div class="space-row">
+        <span class="space-label">--space-xl</span>
+        <div class="space-bar" style="width:24px;">24</div>
+      </div>
+      <div class="space-row">
+        <span class="space-label">--space-2xl</span>
+        <div class="space-bar" style="width:32px;">32</div>
+      </div>
+      <div class="space-row">
+        <span class="space-label">--space-3xl</span>
+        <div class="space-bar" style="width:40px;">40</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 圆角系统 -->
+  <div class="section">
+    <h2 class="section-title">圆角系统 <span class="badge">Radius · 最大 12px</span></h2>
+    <div class="radius-grid">
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:var(--radius-sm);"></div>
+        <div class="radius-label">--radius-sm<br>6px</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:var(--radius-md);"></div>
+        <div class="radius-label">--radius-md<br>8px</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:var(--radius-lg);"></div>
+        <div class="radius-label">--radius-lg<br>10px</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:var(--radius-xl);"></div>
+        <div class="radius-label">--radius-xl<br>12px</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:var(--radius-pill);"></div>
+        <div class="radius-label">--radius-pill<br>999px</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 阴影系统 -->
+  <div class="section">
+    <h2 class="section-title">阴影系统 <span class="badge">Shadow · 几乎不用</span></h2>
+    <div class="shadow-grid">
+      <div class="shadow-item">
+        <div class="shadow-box" style="box-shadow:var(--shadow-none);"></div>
+        <div class="shadow-label">--shadow-none<br>无阴影</div>
+      </div>
+      <div class="shadow-item">
+        <div class="shadow-box" style="box-shadow:var(--shadow-sm);"></div>
+        <div class="shadow-label">--shadow-sm<br>0 1px 3px</div>
+      </div>
+      <div class="shadow-item">
+        <div class="shadow-box" style="box-shadow:var(--shadow-md);"></div>
+        <div class="shadow-label">--shadow-md<br>0 4px 12px</div>
+      </div>
+      <div class="shadow-item">
+        <div class="shadow-box" style="box-shadow:var(--shadow-lg);"></div>
+        <div class="shadow-label">--shadow-lg<br>0 8px 24px</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 动效系统 -->
+  <div class="section">
+    <h2 class="section-title">动效系统 <span class="badge">Motion</span></h2>
+    <div class="type-showcase">
+      <div class="motion-demo">
+        <div class="motion-item">
+          <div class="motion-box" style="transition:transform var(--transition-fast);"></div>
+          <div class="motion-label">--transition-fast<br>120ms</div>
+        </div>
+        <div class="motion-item">
+          <div class="motion-box" style="transition:transform var(--transition-base);"></div>
+          <div class="motion-label">--transition-base<br>200ms</div>
+        </div>
+        <div class="motion-item">
+          <div class="motion-box" style="transition:transform var(--transition-slow);"></div>
+          <div class="motion-label">--transition-slow<br>300ms</div>
+        </div>
+      </div>
+      <p style="font-size:var(--fs-caption);color:var(--text-muted);margin-top:16px;font-family:var(--font-mono);">缓动函数：cubic-bezier(0.23, 1, 0.32, 1) —  hover 方块查看效果</p>
+    </div>
+  </div>
+
+  <!-- 布局 -->
+  <div class="section">
+    <h2 class="section-title">布局 <span class="badge">Layout</span></h2>
+    <div class="layout-demo">
+      <div class="layout-row">
+        <span class="layout-name">--sidebar-width</span>
+        <span class="layout-value">208px</span>
+      </div>
+      <div class="layout-row">
+        <span class="layout-name">--header-height</span>
+        <span class="layout-value">56px</span>
+      </div>
+      <div class="layout-row">
+        <span class="layout-name">--content-max</span>
+        <span class="layout-value">1100px</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设计原则 -->
+  <div class="section">
+    <h2 class="section-title">设计原则 <span class="badge">Principles</span></h2>
+    <div class="token-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
+      <div class="token-card" style="padding:20px;">
+        <h4 style="font-size:var(--fs-body);font-weight:var(--weight-semibold);margin:0 0 8px;color:var(--accent);">Quiet 安静</h4>
+        <p style="font-size:var(--fs-caption);color:var(--text-secondary);line-height:1.6;margin:0;">低饱和度配色，最小化视觉噪音，让内容本身成为焦点。</p>
+      </div>
+      <div class="token-card" style="padding:20px;">
+        <h4 style="font-size:var(--fs-body);font-weight:var(--weight-semibold);margin:0 0 8px;color:var(--accent);">Personal 个人</h4>
+        <p style="font-size:var(--fs-caption);color:var(--text-secondary);line-height:1.6;margin:0;">为思意一人设计，不需要迎合大众审美，只需要自己用着舒服。</p>
+      </div>
+      <div class="token-card" style="padding:20px;">
+        <h4 style="font-size:var(--fs-body);font-weight:var(--weight-semibold);margin:0 0 8px;color:var(--accent);">Soft 柔和</h4>
+        <p style="font-size:var(--fs-caption);color:var(--text-secondary);line-height:1.6;margin:0;">圆角最大 12px，阴影极轻，边框用透明度而非实色，整体触感柔和。</p>
+      </div>
+      <div class="token-card" style="padding:20px;">
+        <h4 style="font-size:var(--fs-body);font-weight:var(--weight-semibold);margin:0 0 8px;color:var(--accent);">Editorial 编辑感</h4>
+        <p style="font-size:var(--fs-caption);color:var(--text-secondary);line-height:1.6;margin:0;">排版有呼吸感，行高宽松，字重只用 400/500/600，不使用粗体。</p>
+      </div>
+      <div class="token-card" style="padding:20px;">
+        <h4 style="font-size:var(--fs-body);font-weight:var(--weight-semibold);margin:0 0 8px;color:var(--accent);">Intelligent 智能</h4>
+        <p style="font-size:var(--fs-caption);color:var(--text-secondary);line-height:1.6;margin:0;">强调色 #7A5ECD 占比 &lt;5%，只用于关键交互和 AI 相关元素。</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.getAttribute('data-theme') === 'dark') {
+        html.removeAttribute('data-theme');
+        document.querySelector('.theme-toggle').textContent = '🌙 切换主题';
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        document.querySelector('.theme-toggle').textContent = '☀️ 切换主题';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Personal AI Workspace — Demo Mode</title>
+<style>
+  :root {
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
+    --text:#e7eaf0; --muted:#9aa3b2; --accent:#5b8cff; --ok:#3fb26f; --warn:#e0a63b;
+    --accent-soft:#22304f;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--text); }
+  .wrap { max-width:1080px; margin:0 auto; padding:20px 16px 60px; }
+  header h1 { font-size:22px; font-weight:700; margin:0 0 4px; }
+  header p { color:var(--muted); margin:0 0 18px; font-size:13px; }
+  .pill { display:inline-block; background:var(--accent-soft); color:#bcd0ff; border-radius:20px;
+    padding:2px 10px; font-size:12px; margin-left:8px; vertical-align:middle; }
+  .tabs { display:flex; gap:8px; margin-bottom:16px; }
+  .tabs button { flex:1; padding:10px; background:var(--panel); color:var(--muted); border:1px solid var(--line);
+    border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; }
+  .tabs button.active { background:var(--accent-soft); color:#cfe0ff; border-color:var(--accent); }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .stats { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; font-size:12px; color:var(--muted); }
+  .stats b { color:var(--text); font-size:16px; }
+  .stat { background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:8px 14px; }
+  .querybar { display:flex; gap:8px; margin-bottom:12px; }
+  .querybar input { flex:1; background:var(--panel2); border:1px solid var(--line); color:var(--text);
+    border-radius:10px; padding:11px 14px; font-size:14px; }
+  .querybar button { background:var(--accent); border:none; color:#fff; font-weight:700; border-radius:10px; padding:0 20px; cursor:pointer; }
+  button.ghost { background:transparent; border:1px solid var(--line); color:var(--muted); border-radius:10px; padding:8px 12px; cursor:pointer; }
+  .stage { margin-bottom:12px; }
+  .stage-head { font-size:12px; color:var(--accent); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em; }
+  .stage-card { background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:6px; font-size:13px; }
+  .stage-card .meta { color:var(--muted); font-size:12px; margin-bottom:4px; }
+  .stage-card .hit { color:var(--ok); }
+  .answer { margin-top:8px; white-space:pre-wrap; line-height:1.7; font-size:14px; }
+  .ingest { display:flex; gap:8px; margin-top:10px; }
+  .ingest input { flex:1; background:var(--panel2); border:1px solid var(--line); color:var(--text); border-radius:8px; padding:8px 12px; font-size:13px; }
+  .ingest textarea { flex:1; min-height:46px; resize:vertical; background:var(--panel2); border:1px solid var(--line); color:var(--text); border-radius:8px; padding:8px 12px; font-size:13px; }
+  .metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:16px; }
+  .metric { background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center; }
+  .metric .v { font-size:26px; font-weight:800; color:var(--accent); }
+  .metric .k { color:var(--muted); font-size:12px; margin-top:4px; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th,td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-weight:600; }
+  td.hit { color:var(--ok); font-weight:600; }
+  td.miss { color:var(--warn); }
+  .result-count { color:var(--muted); font-size:12px; margin-bottom:8px; }
+  hr { border:none; border-top:1px solid var(--line); margin:14px 0; }
+  .muted { color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Personal AI Workspace<span class="pill">Demo Mode</span></h1>
+    <p>零依赖、无密钥的可复现闭环。检索算法与 Agent 循环与应用生产实现一致，语料为通用示例，不含任何个人数据。</p>
+  </header>
+
+  <div class="tabs">
+    <button id="tab-chat" class="active" onclick="switchTab('chat')">对话闭环</button>
+    <button id="tab-eval" onclick="switchTab('eval')">RAG 评测（Recall / MRR）</button>
+  </div>
+
+  <!-- 对话闭环 -->
+  <div id="view-chat">
+    <div class="stats" id="stats"></div>
+    <div class="panel">
+      <div class="querybar">
+        <input id="q" placeholder="问一个问题，例如：Nova Labs 的 Workbench 核心能力是什么？" />
+        <button onclick="send()">发送</button>
+      </div>
+      <div id="chat-output"></div>
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <div class="stage-head">运行时入知识（演示增量索引）</div>
+      <div class="ingest">
+        <input id="in-title" placeholder="标题（可选）" />
+        <textarea id="in-content" placeholder="粘贴一段你想入库、然后被 RAG 检索的文本…"></textarea>
+        <button class="ghost" onclick="ingest()">入库</button>
+      </div>
+      <p class="muted">入库后，在下方输入相关关键词，即可看到它被检索命中（只影响本次 Demo 会话，不写盘）。</p>
+    </div>
+  </div>
+
+  <!-- RAG 评测 -->
+  <div id="view-eval" style="display:none">
+    <div class="panel">
+      <div class="querybar">
+        <button onclick="runEval('hybrid')">运行评测 (hybrid)</button>
+        <button class="ghost" onclick="runEval('bm25')">bm25</button>
+        <button class="ghost" onclick="runEval('vector')">vector</button>
+        <p class="muted" style="margin:0;align-self:center">带 ground-truth 的 10 条查询</p>
+      </div>
+      <div class="metrics" id="metrics"></div>
+      <div class="result-count" id="eval-summary"></div>
+      <div id="eval-table"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function refreshStats() {
+  try {
+    const r = await fetch('/api/stats').then(x => x.json());
+    document.getElementById('stats').innerHTML =
+      `<div class="stat"><b>${r.docs}</b> 文档<br><span class="muted">${r.chunks} 分块</span></div>` +
+      `<div class="stat"><b>${r.tools.length}</b> 工具<br><span class="muted">${r.tools.join(', ')}</span></div>` +
+      `<div class="stat"><b>${r.memory.length}</b> 条记忆<br><span class="muted">${r.memory.join(', ')}</span></div>`;
+  } catch (e) {}
+}
+
+function switchTab(t) {
+  document.getElementById('tab-chat').classList.toggle('active', t === 'chat');
+  document.getElementById('tab-eval').classList.toggle('active', t === 'eval');
+  document.getElementById('view-chat').style.display = t === 'chat' ? '' : 'none';
+  document.getElementById('view-eval').style.display = t === 'eval' ? '' : 'none';
+}
+
+function card(head, extra, body, ok) {
+  return `<div class="stage-card">
+    <div class="meta">${ok ? '<span class="hit">✓</span> ' : ''}${head}${extra}</div>
+    ${body}
+  </div>`;
+}
+
+async function send() {
+  const q = document.getElementById('q').value.trim();
+  if (!q) return;
+  const out = document.getElementById('chat-output');
+  out.innerHTML = `<div class="stage-card"><div class="muted">处理中…</div></div>`;
+  try {
+    const data = await fetch('/api/chat', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: q }),
+    }).then(x => x.json());
+
+    let html = `<div class="stage-head">闭环路径 · ${data.iterations} 次迭代</div>`;
+    const s = data.stages;
+
+    if (s[0]) html += `<div class="stage">${s[0].items.map(i => card(
+      `<b>${i.file}</b>  《${i.heading}》`, ` score=${i.score}`,
+      `<div class="muted">${escapeHtml(i.content)}</div>`, true)).join('')}</div>`;
+
+    if (s[1]) html += `<div class="stage">${s[1].items.length
+      ? s[1].items.map(i => card(`记忆 <b>${i.key}</b>`, '', `<div class="muted">${escapeHtml(i.value)}</div>`, true)).join('')
+      : `<div class="stage-card muted">本次未召回长期记忆</div>`}</div>`;
+
+    if (s[2]) html += `<div class="stage">${s[2].items.map(i => card(
+      `工具 <b>${i.name}</b>`, ` ${i.success ? '成功' : '失败'} · ${i.duration}ms`,
+      `<div class="muted">args=${escapeHtml(JSON.stringify(i.args))}</div>`, i.success)).join('')}</div>`;
+
+    html += `<div class="answer">${escapeHtml(data.answer)}</div>`;
+    out.innerHTML = html;
+  } catch (e) {
+    out.innerHTML = `<div class="stage-card"><div class="muted">调用失败：${escapeHtml(e.message)}</div></div>`;
+  }
+}
+
+async function ingest() {
+  const title = document.getElementById('in-title').value.trim();
+  const content = document.getElementById('in-content').value.trim();
+  if (!content) return alert('请粘贴内容');
+  const r = await fetch('/api/ingest', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, content }),
+  }).then(x => x.json());
+  alert(`已入库 ${r.added} 个分块 -> ${r.filePath}`);
+  document.getElementById('in-content').value = '';
+  refreshStats();
+}
+
+async function runEval(mode) {
+  const r = await fetch('/api/eval?mode=' + mode).then(x => x.json());
+  document.getElementById('metrics').innerHTML = Object.entries(r.metrics).map(([k, v]) =>
+    `<div class="metric"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+  document.getElementById('eval-summary').innerHTML = `共 ${r.n} 条查询 · mode=${r.mode}`;
+  document.getElementById('eval-table').innerHTML =
+    `<table><tr><th>查询</th><th>期望来源</th><th>命中</th><th>Top3</th></tr>` +
+    r.perQuery.map(q => {
+      const top = q.top.map(t => `${t.hit ? '✓' : ' '}${t.file}(${t.score})`).filter((_, i) => i < 3).join(' · ');
+      const rank = q.hitRank === null ? '<span class="miss">未命中</span>' : `<span class="hit">#${q.hitRank}</span>`;
+      return `<tr><td>${escapeHtml(q.query)}</td><td>${q.gold.join(', ')}</td><td>${rank}</td><td>${escapeHtml(top)}</td></tr>`;
+    }).join('') + '</table>';
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+refreshStats();
+</script>
+</body>
+</html>

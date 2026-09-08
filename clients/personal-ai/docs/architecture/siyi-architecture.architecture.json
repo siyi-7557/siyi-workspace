@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "思意 · 个人 AI 系统全链路架构",
+    "subtitle": "桌面工作台 × Obsidian × Meet Siyi 个人网站",
+    "locale": "zh-CN",
+    "visual_preset": "signal-flow",
+    "animation": "trace",
+    "quality_profile": "standard",
+    "output": "siyi-architecture.html",
+    "viewBox": [2160, 1000],
+    "views": [
+      {
+        "id": "core-loop",
+        "label": "核心 AI 链路",
+        "focus": ["user", "electron-shell", "workbench-ui", "node-backend", "ai-core", "llm-api"],
+        "note": "用户提问 → 工作台 → AI 中枢 → 大模型"
+      },
+      {
+        "id": "knowledge-pipeline",
+        "label": "知识索引",
+        "focus": ["obsidian-vault", "obsidian-scanner", "sqlite", "ai-core"],
+        "note": "Obsidian 笔记 → 扫描 → 索引 → RAG 检索"
+      },
+      {
+        "id": "radar-flow",
+        "label": "信息雷达",
+        "focus": ["rss-sources", "radar-engine", "ai-core", "sqlite"],
+        "note": "RSS 采集 → AI 筛选 → 推荐 → 入库"
+      },
+      {
+        "id": "cloud-sync",
+        "label": "云端联动",
+        "focus": ["site-frontend", "cloud-chat", "cloud-db", "cloud-stats", "workbench-ui"],
+        "note": "网站助手 → 云数据库 → 访客会话同步回工作台"
+      }
+    ]
+  },
+  "components": [
+    { "id": "user", "type": "external", "label": "你", "sublabel": "桌面 + 网页", "pos": [250, 70], "size": [130, 60] },
+    { "id": "obsidian-vault", "type": "external", "label": "Obsidian Vault", "sublabel": "笔记仓库", "pos": [30, 70], "size": [170, 60] },
+    { "id": "llm-api", "type": "external", "label": "大模型 API", "sublabel": "豆包 · DeepSeek · 智谱 · 通义", "pos": [1060, 70], "size": [190, 60] },
+    { "id": "rss-sources", "type": "external", "label": "RSS / 网页信息源", "sublabel": "GitHub Trending 等", "pos": [610, 600], "size": [180, 60] },
+
+    { "id": "electron-shell", "type": "frontend", "label": "Electron 壳", "sublabel": "窗口 · 托盘 · 端口自愈", "pos": [130, 240], "size": [180, 60] },
+    { "id": "workbench-ui", "type": "frontend", "label": "工作台 UI", "sublabel": "总览·知识·复盘·提示词·雷达·网站·AI", "pos": [360, 240], "size": [200, 60] },
+    { "id": "node-backend", "type": "backend", "label": "Node API 服务", "sublabel": "Express · 模块化路由", "pos": [610, 240], "size": [180, 60] },
+    { "id": "ai-core", "type": "cloud", "label": "AI 中枢", "sublabel": "对话 · 复盘 · 报告 · RAG", "pos": [840, 240], "size": [180, 60] },
+
+    { "id": "obsidian-scanner", "type": "backend", "label": "Obsidian 扫描", "sublabel": "解析 · 索引 · Watch", "pos": [130, 420], "size": [180, 60] },
+    { "id": "sqlite", "type": "database", "label": "SQLite", "sublabel": "workbench.db", "pos": [360, 420], "size": [160, 60] },
+    { "id": "radar-engine", "type": "backend", "label": "信息雷达引擎", "sublabel": "采集 · 筛选 · 推荐", "pos": [610, 420], "size": [180, 60] },
+    { "id": "backup", "type": "backend", "label": "数据备份", "sublabel": "快照 · 恢复", "pos": [840, 420], "size": [170, 60] },
+
+    { "id": "site-frontend", "type": "frontend", "label": "Meet Siyi 网页", "sublabel": "首页 · 关于 · Now · AI 助手", "pos": [1300, 240], "size": [180, 60] },
+    { "id": "cloud-chat", "type": "cloud", "label": "云函数 · 智能助手", "sublabel": "多模型降级 · Function Calling", "pos": [1300, 420], "size": [190, 60] },
+    { "id": "cloud-stats", "type": "cloud", "label": "云函数 · admin-stats", "sublabel": "会话统计与洞察", "pos": [1300, 600], "size": [190, 60] },
+    { "id": "cloud-db", "type": "database", "label": "云数据库", "sublabel": "chat_sessions / messages", "pos": [1560, 240], "size": [180, 60] },
+    { "id": "persona-docs", "type": "database", "label": "人格知识", "sublabel": "persona / RAG 文档", "pos": [1560, 420], "size": [180, 60] }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "思意工作台 · 桌面端",
+      "wraps": ["electron-shell", "workbench-ui", "node-backend", "ai-core", "obsidian-scanner", "sqlite", "radar-engine", "backup"]
+    },
+    {
+      "kind": "region",
+      "label": "Meet Siyi · 个人网站（云端）",
+      "wraps": ["site-frontend", "cloud-chat", "cloud-stats", "cloud-db", "persona-docs"]
+    }
+  ],
+  "connections": [
+    { "from": "user", "to": "electron-shell", "label": "桌面使用", "fromSide": "bottom", "toSide": "top", "via": [[315, 200], [220, 200]], "labelAt": [267, 192] },
+    { "from": "user", "to": "site-frontend", "label": "网页访问", "variant": "dashed", "fromSide": "top", "toSide": "top", "via": [[315, 45], [1390, 45]], "labelAt": [1000, 33] },
+
+    { "from": "electron-shell", "to": "workbench-ui", "label": "托管渲染进程", "labelAt": [335, 314] },
+    { "from": "workbench-ui", "to": "node-backend", "label": "HTTP /api/*", "variant": "emphasis", "labelAt": [585, 314] },
+    { "from": "node-backend", "to": "ai-core", "label": "AI 编排", "variant": "emphasis", "labelAt": [815, 314] },
+    { "from": "ai-core", "to": "llm-api", "label": "大模型调用", "variant": "emphasis", "fromSide": "top", "toSide": "bottom" },
+
+    { "from": "obsidian-scanner", "to": "obsidian-vault", "label": "读取笔记", "fromSide": "left", "toSide": "bottom", "via": [[30, 450], [30, 200], [115, 200]], "labelDx": 12 },
+    { "from": "obsidian-scanner", "to": "sqlite", "label": "写入知识索引", "labelAt": [335, 496] },
+
+    { "from": "radar-engine", "to": "rss-sources", "label": "定时采集", "fromSide": "bottom", "toSide": "top", "labelAt": [712, 540] },
+    { "from": "radar-engine", "to": "sqlite", "label": "写入雷达项", "labelAt": [565, 496] },
+    { "from": "radar-engine", "to": "ai-core", "label": "AI 相关性筛选", "variant": "dashed", "fromSide": "right", "toSide": "bottom", "via": [[830, 450], [830, 360], [930, 360]], "labelAt": [880, 372] },
+
+    { "from": "backup", "to": "sqlite", "label": "读取快照", "fromSide": "bottom", "toSide": "bottom", "via": [[925, 700], [440, 700]], "labelAt": [682, 712] },
+
+    { "from": "site-frontend", "to": "cloud-chat", "label": "调用云函数", "fromSide": "bottom", "toSide": "top", "labelAt": [1390, 350] },
+    { "from": "cloud-chat", "to": "cloud-db", "label": "读写会话", "fromSide": "bottom", "toSide": "right", "via": [[1395, 560], [1760, 560], [1760, 270]], "labelAt": [1575, 572] },
+    { "from": "cloud-chat", "to": "persona-docs", "label": "人格知识", "labelAt": [1525, 462] },
+    { "from": "cloud-chat", "to": "llm-api", "label": "大模型调用", "fromSide": "left", "toSide": "bottom" },
+    { "from": "cloud-stats", "to": "cloud-db", "label": "统计查询", "fromSide": "right", "toSide": "right", "via": [[1800, 630], [1800, 270]], "labelAt": [1630, 622] },
+
+    { "from": "workbench-ui", "to": "cloud-stats", "label": "同步访客会话", "variant": "dashed", "fromSide": "bottom", "toSide": "bottom", "via": [[460, 340], [1200, 340], [1200, 780], [1395, 780]], "labelAt": [700, 330] }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "桌面工作台",
+      "items": [
+        "Electron 壳 · 托盘 / 端口自愈",
+        "8 个功能模块前端",
+        "Node.js Express 模块化 API",
+        "SQLite 本地存储，数据自持"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "AI 中枢",
+      "items": [
+        "ai-core 统一编排：对话 / 复盘 / 报告 / 洞察",
+        "RAG：分块 + 向量化 + 检索",
+        "信息雷达用 AI 做相关性筛选",
+        "对接豆包 / DeepSeek / 智谱 / 通义"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Obsidian 联动",
+      "items": [
+        "扫描 Vault 生成知识索引",
+        "复盘从笔记提取并回写",
+        "行动项 / 成长报告沉淀到本地库"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "云端联动",
+      "items": [
+        "Meet Siyi 网站 AI 助手（云函数）",
+        "多模型自动降级 + Function Calling",
+        "工作台拉取访客会话做洞察",
+        "洞察可一键转成 AI 复盘"
+      ]
+    }
+  ]
+}

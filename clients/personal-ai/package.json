@@ -1,0 +1,44 @@
+{
+  "name": "siyi-workbench",
+  "version": "0.1.0",
+  "description": "思意工作台 - AI增强个人知识管理与生产力工作台",
+  "main": "electron/electron-main.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "electron": "electron .",
+    "electron:dev": "electron . --dev",
+    "demo": "node demo/run-full.js",
+    "demo:eval": "node demo/run-eval.js",
+    "demo:memory": "node demo/run-memory.js",
+    "demo:agent": "node demo/run-agent.js",
+    "demo:full": "node demo/run-full.js",
+    "demo:web": "node demo/run-server.js",
+    "demo:app": "node demo/run-app.js",
+    "demo:init": "node demo/init-demo.js",
+    "eval:rag": "node demo/run-eval.js"
+  },
+  "keywords": [
+    "ai",
+    "rag",
+    "obsidian",
+    "knowledge-management",
+    "productivity"
+  ],
+  "author": "Siyi",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.4",
+    "better-sqlite3": "^12.11.1",
+    "chokidar": "^3.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "front-matter": "^4.0.2",
+    "markdown-it": "^14.1.0"
+  },
+  "devDependencies": {
+    "electron": "^41.7.1",
+    "electron-rebuild": "^3.2.9"
+  }
+}
