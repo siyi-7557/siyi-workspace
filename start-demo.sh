@@ -9,6 +9,19 @@ echo "  (复刻工作台界面，数据为虚构 Nova Labs)"
 echo "============================================"
 echo
 
+# 环境检查：是否已安装 Node.js
+if ! command -v node >/dev/null 2>&1; then
+  echo
+  echo "[错误] 未检测到 Node.js，无法安装依赖。"
+  echo "       请先安装 Node.js LTS 版：https://nodejs.org"
+  echo "       安装后重新运行本脚本。"
+  (open "https://nodejs.org" 2>/dev/null || xdg-open "https://nodejs.org" 2>/dev/null || true)
+  read -r -p "按回车退出" _
+  exit 1
+fi
+echo "[OK] 已检测到 Node.js，版本：$(node -v)"
+echo
+
 if [ -d node_modules ]; then
   echo "[1/4] 依赖已安装，跳过 npm install"
 else
