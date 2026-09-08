@@ -1,0 +1,11 @@
+# Windows 批处理用 CRLF，避免解压后批处理异常
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# shell 脚本用 LF
+*.sh text eol=lf
+
+# 文本统一按平台换行
+*.md text
+*.js text
+*.json text
