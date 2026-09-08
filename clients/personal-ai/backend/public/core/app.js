@@ -123,7 +123,7 @@ const App = {
       // Alt+1~0 切换模块
       if (e.altKey && ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].includes(e.key)) {
         e.preventDefault();
-        const modules = ['overview', 'search', 'obsidian-reviews', 'prompt', 'website', 'settings'];
+        const modules = ['overview', 'search', 'obsidian-reviews', 'prompt', 'settings'];
         const idx = e.key === '0' ? 9 : parseInt(e.key) - 1;
         if (modules[idx]) this.switchModule(modules[idx]);
         return;
