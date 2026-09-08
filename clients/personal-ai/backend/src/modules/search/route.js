@@ -1,7 +1,7 @@
 /**
  * 知识模块路由 - 原语义检索升级为个人知识空间
  *
- * 底层统一调用 G:\SIYI-Hermess\Siyi-OS\ai-core\knowledge\service.js
+ * 底层统一调用 <repo>/ai-core/knowledge/service.js
  * 保留原 /api/search 接口向后兼容（顶部全局搜索使用）
  * 新增 /api/search/knowledge/* 知识空间接口
  */
