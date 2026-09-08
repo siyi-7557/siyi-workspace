@@ -50,7 +50,6 @@ const routePathMap = {
   learning: '/api/learning',
   codex: '/api/codex-sessions',
   pitfalls: '/api/pitfalls',
-  website: '/api/website-admin',
   backup: '/api/backup',
   config: '/api/config',
   'personal-ai': '/api/personal-ai',
@@ -61,10 +60,6 @@ const modulesDir = path.join(__dirname, 'modules');
 const loadedModules = [];
 if (fs.existsSync(modulesDir)) {
   fs.readdirSync(modulesDir).forEach(modName => {
-    if (modName === 'website' && config.isDemo()) {
-      console.log('[Module] Demo 模式跳过私人模块: website');
-      return;
-    }
     const modPath = path.join(modulesDir, modName);
     const indexPath = path.join(modPath, 'index.js');
     if (fs.statSync(modPath).isDirectory() && fs.existsSync(indexPath)) {

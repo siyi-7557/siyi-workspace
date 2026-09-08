@@ -84,8 +84,6 @@ const API = {
   getPitfalls: (tech, search) => API.request('GET', `/learning/pitfalls?tech=${encodeURIComponent(tech || '')}&search=${encodeURIComponent(search || '')}`),
   generateLearningPath: (data) => API.request('POST', '/learning/learning-path', data),
   writingCheck: (data) => API.request('POST', '/learning/writing-check', data),
-  getWebsiteStats: () => API.request('GET', '/website-admin/stats'),
-  getWebsiteSession: (id) => API.request('GET', `/website-admin/session/${id}`),
   getModels: () => API.request('GET', '/ai/models'),
 
   // 健康检查

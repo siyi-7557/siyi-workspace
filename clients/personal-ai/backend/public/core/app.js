@@ -557,7 +557,6 @@ const App = {
       'obsidian-reviews': { title: '复盘', desc: '把 AI 使用记录转化为洞察、Prompt 和行动' },
       radar: { title: '信息雷达', desc: '与思意真正相关的信息筛选器' },
       english: { title: '英语学习', desc: '思意的英语学习空间' },
-      website: { title: '网站', desc: '网站后台管理' },
       settings: { title: '设置', desc: '配置索引源、API 和系统偏好' },
     };
     const m = meta[module] || { title: module, desc: '' };
