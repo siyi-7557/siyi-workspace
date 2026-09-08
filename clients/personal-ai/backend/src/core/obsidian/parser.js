@@ -1,4 +1,24 @@
-const fm = require('front-matter');
+// 优先使用 front-matter 三方包；未安装时用内置极简 front-matter 解析兜底（保证零依赖 CI/演示也能跑）
+let fm;
+try {
+  fm = require('front-matter');
+} catch (e) {
+  fm = (content) => {
+    const text = String(content).replace(/^\uFEFF/, '');
+    const m = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!m) return { attributes: {}, body: content };
+    const attributes = {};
+    m[1].split(/\r?\n/).forEach(line => {
+      const [k, ...rest] = line.split(':');
+      if (k && rest.length) {
+        let v = rest.join(':').trim();
+        if (v.startsWith('[') && v.endsWith(']')) v = v.slice(1, -1).split(',').map(s => s.trim());
+        attributes[k.trim()] = v;
+      }
+    });
+    return { attributes, body: m[2] };
+  };
+}
 
 // 解析Markdown文件，提取frontmatter、标题结构、正文分块
 function parseMarkdown(content) {
