@@ -35,7 +35,15 @@ npm run demo:agent    # Agent / 工具调用 + 权限过滤
 npm run demo:full     # 入库→检索→记忆→工具→回答（全链路）
 ```
 
-> 视图、检索、记忆、评测**无需 API Key**。聊天需要填一个智谱 `ZHIPU_API_KEY`（`clients/personal-ai/.env`）；未配置时界面会给出清晰提示。
+> **这个仓库的「demo」是什么？** 本仓库只含**虚构数据**（虚构公司 Nova Labs + 虚构创始人 Alex），所以叫 **Sanitized Demo**——跑起来是你的工作台界面，但内容全是虚构，**不含你的任何个人数据**。
+>
+> **两条入口的分工**：
+> - `demo:web`（http://localhost:8789）：**零依赖、无需任何 key**，看「检索→记忆→工具→回答」四段式闭环 + RAG 评测面板。这是 **HR 看全流程效果走这条**。
+> - `demo:app`（http://localhost:8788）：**真实工作台完整界面**（侧边栏/统计卡/知识卡片），数据虚构；聊天需填 `ZHIPU_API_KEY`。
+
+> **两个 API Key（都在 `clients/personal-ai/.env`，复制 `.env.example` 后填写，不会入库）**：
+> - `ZHIPU_API_KEY` —— **聊天/回答**用（智谱 GLM）。不填则聊天提示「未配置 Key」；视图/检索/记忆/评测**无需**。
+> - `SILICONFLOW_API_KEY` —— **语义向量检索**用（硅基流动 BGE-m3）。填了才真正走「BM25+向量」混合，**召回质量更好**；不填回退纯 BM25（召回略降）。两个是不同的服务商，**需分别申请，不能一个顶两个**。
 
 ### Demo 的 RAG 评测结果（真实运行产出）
 
